@@ -4,14 +4,7 @@ using DataFrames
 file = joinpath(pwd(), "data", "responses_raw.csv")
 df = CSV.read(file, DataFrame)
 
-# Drop Missing Values
-dropmissing!(df, [:age, :sex, :marriage, :income])
-dropmissing!(df, r"^hb_")
-filter!(:sex => !=("Prefiro não dizer"), df)
-
 # Categorical Coding
-# transform!(df, [:age, :sex, :marriage, :income] .=> categorical, renamecols=false)
-
 function recode_hb(x::String)
     return x == "Discordo fortemente"       ? -2 :
            x == "Discordo"                  ? -1 :
@@ -29,7 +22,7 @@ end
 
 function recode_be(x::String)
     return x == "Nunca"          ? 0 :
-           x == "Pouco"      ? 1 :
+           x == "Pouco"          ? 1 :
            x == "Algumas vezes"  ? 2 :
            x == "Frequentemente" ? 3 :
            x == "Sempre"         ? 4 : missing
@@ -73,18 +66,32 @@ function recode_income(x::String)
            x == "Acima de R\$ 3.566"       ? 5 : missing
 end
 
-transform!(df, :sex => ByRow(x -> ifelse(x == "Masculino", 1, 0)) => :sex_male)
+function clean_data!(df::DataFrame)
+    # Drop Missing Values
+    dropmissing!(df, [:age, :sex, :marriage, :income])
+    dropmissing!(df, r"^hb_")
+    dropmissing!(df, r"^afra")
+    dropmissing!(df, r"^be_")
+    dropmissing!(df, r"^f\w{2}")
+    dropmissing!(df, r"^confi_")
+    filter!(:sex => !=("Prefiro não dizer"), df)
 
-select!(df,
-        :age                    => x -> recode_age.(x),
-        :sex_male,
-        :marriage               => x -> recode_mariage.(x),
-        :income                 => x -> recode_income.(x),
-        names(df, r"^hb_")     .=> x -> recode_hb.(x),
-        names(df, r"^afra")    .=> x -> recode_afra.(x),
-        names(df, r"^be_")     .=> x -> recode_be.(x),
-        names(df, r"^f\w{2}")  .=> x -> recode_fmedia.(x),
-        names(df, r"^confi_")  .=> x -> recode_confi.(x),
-        renamecols=false)
+    # Transformations
+    transform!(df, :sex => ByRow(x -> ifelse(x == "Masculino", 1, 0)) => :sex_male)
+
+    select!(df,
+            :age                    => x -> recode_age.(x),
+            :sex_male,
+            :marriage               => x -> recode_mariage.(x),
+            :income                 => x -> recode_income.(x),
+            names(df, r"^hb_")     .=> x -> recode_hb.(x),
+            names(df, r"^afra")    .=> x -> recode_afra.(x),
+            names(df, r"^be_")     .=> x -> recode_be.(x),
+            names(df, r"^f\w{2}")  .=> x -> recode_fmedia.(x),
+            names(df, r"^confi_")  .=> x -> recode_confi.(x),
+            renamecols=false)
+end
+
+clean_data!(df)
 
 df |> CSV.write(joinpath(pwd(), "data", "responses_clean.csv"))
