@@ -1,7 +1,8 @@
 using CSV
 using DataFrames
 
-df = CSV.read("data/responses_raw.csv", DataFrame)
+file = joinpath(pwd(), "data", "responses_raw.csv")
+df = CSV.read(file, DataFrame)
 
 # Drop Missing Values
 dropmissing!(df, [:age, :sex, :marriage, :income])
@@ -86,4 +87,4 @@ select!(df,
         names(df, r"^confi_")  .=> x -> recode_confi.(x),
         renamecols=false)
 
-df |> CSV.write("data/responses_clean.csv")
+df |> CSV.write(joinpath(pwd(), "data", "responses_clean.csv"))
