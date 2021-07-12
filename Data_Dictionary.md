@@ -16,7 +16,7 @@
 | Você tem permanecido em casa e em isolamento social?                                                                                                                   | `isolation`      | binary |
 | O quanto você está com medo de contrair o Coronavírus?                                                                                                                 | `afra1`          | 4      |
 | O quanto você está com medo de que algum familiar próximo contraia o Coronavírus?                                                                                      | `afra2`          | 4      |
-| Quanto tempo por dia você gasta normalmente checando as notícias sobre COVID-19?                                                                                       | `hmtime`         | open   |
+| Quanto tempo por dia você gasta normalmente checando as notícias sobre COVID-19?                                                                                       | `hmtime`         | 4      |
 | Quais são os tipos de informações que mais lhe interessam sobre o COVID-19?                                                                                            | `interest`       | open   |
 | Quando busca informações sobre COVID-19, qual a frequência que você usa as seguintes fontes? [Jornal]                                                                  | `fnp`            | 5      |
 | Quando busca informações sobre COVID-19, qual a frequência que você usa as seguintes fontes? [Televisão]                                                               | `ftv`            | 5      |
