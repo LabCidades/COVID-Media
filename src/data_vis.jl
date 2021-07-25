@@ -13,7 +13,11 @@ labels_list = [
     :fra => "Radio",
     :fws => "Website",
     :fsm => "Social Media",
-    :fmp => "Health Professionals"
+    :fmp => "Health Professionals",
+    :hb_p_pbe => "Healthy Behavior can Protect from COVID-19",
+    :hb_a_pbe => "Healthy Behavior can Keep Health\n after Reading Information from Media?",
+    :hb_b_se => "Confidence to Conduct Healthy Behaviours?",
+    :hb_a_se => "Confidence to Conduct Healthy Behaviours During Outbreak?"
 ]
 
 # function draw_figures(df::DataFrame, x::Symbol, label::String, grouping::Symbol)
@@ -65,9 +69,9 @@ labels_list = [
 #     end
 # end
 
-function draw_figures(df::DataFrame, x::Symbol, label::String)
+function draw_figure(df::DataFrame, label::Pair{Symbol, String})
     # Problems with Int stuff
-    transform!(df, x => float, renamecols=false)
+    transform!(df, label.first => float, renamecols=false)
     transform!(df, [:sex_male, :age, :marriage, :income] .=> float, renamecols=false)
 
     # Create Figure
@@ -76,9 +80,9 @@ function draw_figures(df::DataFrame, x::Symbol, label::String)
 
     # Create Specs
     specs_data = data(df)
-    specs_histogram = specs_data * mapping(x => "Frequency") * frequency()
+    specs_histogram = specs_data * mapping(label.first => "Frequency") * frequency()
     specs_sex = specs_data * mapping(:sex_male => renamer(0 => "Female", 1 => "Male") => "sex",
-                                     x => "") *
+                                     label.first => "") *
                                 expectation()
     specs_age = specs_data * mapping(:age => renamer(
                                         1 => "17-",
@@ -86,14 +90,14 @@ function draw_figures(df::DataFrame, x::Symbol, label::String)
                                         3 => "31-50",
                                         4 => "51-70",
                                         5 => "70+"),
-                                        x => "") *
-                                    expectation()
+                                     label.first => "") *
+                                expectation()
     specs_marriage = specs_data * mapping(:marriage => renamer(
                                             1 => "Single",
                                             2 => "Married",
                                             3 => "Divorced/Widow"),
-                                          x => "") *
-                                    expectation()
+                                          label.first => "") *
+                                     expectation()
 
     specs_income = specs_data * mapping(:income => renamer(
                                            1 => "BRL 0 - 178",
@@ -101,19 +105,19 @@ function draw_figures(df::DataFrame, x::Symbol, label::String)
                                            3 => "BRL 369 - 1,008",
                                            4 => "BRL 1,009 - 3,566",
                                            5 => "BRL 3,557+"),
-                                        x => "") *
-                                    expectation()
+                                        label.first => "") *
+                                   expectation()
 
     # Draw Figure
     draw!(fig[1, 1:2], specs_histogram)
     fig[2, 1:2] = Label(fig, "Expectation", textsize=24, color=(:black, 1.0))
-    draw!(fig[3, 1], specs_sex; axis=(xticklabelrotation=0.5, ylims=(0, 4)))
-    draw!(fig[3, 2], specs_age; axis=(xticklabelrotation=0.5, ylims=(0, 4)))
-    draw!(fig[4, 1], specs_marriage; axis=(xticklabelrotation=0.5, yticks=0:1:4))
-    draw!(fig[4, 2], specs_income; axis=(xticklabelrotation=0.5, yticks=0:1:4))
+    draw!(fig[3, 1], specs_sex; axis=(xticklabelrotation=0.5,))
+    draw!(fig[3, 2], specs_age; axis=(xticklabelrotation=0.5,))
+    draw!(fig[4, 1], specs_marriage; axis=(xticklabelrotation=0.5,))
+    draw!(fig[4, 2], specs_income; axis=(xticklabelrotation=0.5,))
 
     # Supertitle
-    fig[0, 1:2] = Label(fig, label, textsize=36, color=(:black, 1.0))
+    fig[0, 1:2] = Label(fig, label.second, textsize=36, color=(:black, 1.0))
 
     # Legend
     # fig[end+1, 1:] = Legend(fig, [specs_boxplot, specs_boxplot], ["Female", "Male"])
@@ -124,5 +128,5 @@ function save_figure(fig::Figure, filename::String; quality=3)
     save(joinpath(pwd(), "figures", "$(filename).png"), fig, px_per_unit=quality)
 end
 
-figures = map(x -> draw_figures(df, x.first, x.second), labels_list)
-map((x, y) -> save_figure(x, y.second, quality=2), figures, labels_list)
+figures = map(x -> draw_figure(df, x), labels_list)
+map((x, y) -> save_figure(x, string(y.first), quality=2), figures, labels_list)
