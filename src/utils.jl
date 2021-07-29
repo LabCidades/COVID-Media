@@ -92,6 +92,10 @@ function clean_data!(df::DataFrame)
             names(df, r"^f\w{2}")  .=> x -> recode_fmedia.(x),
             names(df, r"^confi_")  .=> x -> recode_confi.(x),
             renamecols=false)
+    transform!(df,
+            names(df, r"^hb_")     => ByRow(+) => :hb_sum,
+            names(df, r"^afra")    => ByRow(+) => :afra_sum,
+            names(df, r"^be_")     => ByRow(+) => :be_sum)
 end
 
 # Crombach
