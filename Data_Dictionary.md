@@ -35,7 +35,7 @@
 | Uso de Redes Sociais [Você já postou um comentário ou uma pergunta no YouTube?]                                                                                        | `comment_2`      | binary |
 | Crenças de saúde antes da exposição [Você acredita que está em alto risco de ficar doente com COVID-19?]                                                               | `hb_b_psu`       | 5      |
 | Crenças de saúde antes da exposição [Você acredita que se ficar doente de COVID-19, a doença será severa?]                                                             | `hb_b_pse`       | 5      |
-| Crenças de saúde antes da exposição [Você acredita que comportamentos saudáveis podem lhe proteger de ficar doente de COVID-19?]                                       | `hb_p_pbe`       | 5      |
+| Crenças de saúde antes da exposição [Você acredita que comportamentos saudáveis podem lhe proteger de ficar doente de COVID-19?]                                       | `hb_b_pbe`       | 5      |
 | Crenças de saúde antes da exposição [Você acredita que é difícil manter comportamentos saudáveis que protegem contra o risco de ficar doente de COVID-19?]             | `hb_b_pba`       | 5      |
 | Crenças de saúde antes da exposição [Você se sente seguro em manter comportamentos saudáveis?]                                                                         | `hb_b_se`        | 5      |
 | Crenças de saúde depois da exposição [Você acredita que é suscetível a ser infectado pelo COVID-19 depois de receber informações dos veículos de comunicação?]         | `hb_a_psu`       | 5      |

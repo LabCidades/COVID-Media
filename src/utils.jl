@@ -93,9 +93,14 @@ function clean_data!(df::DataFrame)
             names(df, r"^confi_")  .=> x -> recode_confi.(x),
             renamecols=false)
     transform!(df,
-            names(df, r"^hb_")     => ByRow(+) => :hb_sum,
-            names(df, r"^afra")    => ByRow(+) => :afra_sum,
-            names(df, r"^be_")     => ByRow(+) => :be_sum)
+            [:hb_b_pbe, :hb_b_se,
+             :hb_a_pbe, :hb_a_se]   => ByRow(+) => :hb_sum,
+            names(df, r"^afra")     => ByRow(+) => :afra_sum,
+            names(df, r"^be_")      => ByRow(+) => :be_sum)
+    transform!(df,
+            :hb_sum                 => ByRow(x -> x / 4)  => :hb_mean,
+            :afra_sum               => ByRow(x -> x / length(names(df, r"^afra"))) => :afra_mean,
+            :be_sum                 => ByRow(x -> x / length(names(df, r"^be_")))  => :be_mean)
 end
 
 # Crombach
