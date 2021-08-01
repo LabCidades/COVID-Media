@@ -119,54 +119,42 @@ end
 
 # Data Vis
 
-# function draw_figures(df::DataFrame, x::Symbol, label::String, grouping::Symbol)
-#     # Create Figure
-#     resolution = (800, 640) .* 1.5
-#     fig = Figure(; resolution)
+function draw_violin(df::DataFrame, label::Pair{Symbol, String})
+    # Problems with Int stuff
+    transform!(df, label.first => float, renamecols=false)
 
-#     # Create Specs
-#     specs_data = data(df)
-#     specs_histogram = specs_data * mapping(x => "") * frequency()
-#     specs_boxplot = data(df) * mapping(
-#                 :age => renamer(1 => "17-", 2 => "18-30", 3 => "31-50", 4 => "51-70", 5 => "70+"),
-#                 x => "",
-#                 color=:sex_male => renamer(0 => "Female", 1 => "Male"),
-#                 dodge=:sex_male => renamer(0 => "Female", 1 => "Male")) *
-#                 visual(BoxPlot)
+    # Create Figure
+    resolution = (800, 640)
+    fig = Figure(; resolution)
 
-#     if grouping == :marriage
-#         specs_boxplot *= mapping(col=:marriage => renamer(1 => "Single",
-#                                                           2 => "Married",
-#                                                           3 => "Divorced/Widow"))
+    # Create Specs
+    specs_data = data(df)
+    specs_density = specs_data * mapping(
+                label.first => "";
+                color=:sex_male => renamer(0 => "Female", 1 => "Male") => "Sex") *
+                histogram(normalization=:pdf) * visual(alpha=0.5)
+    specs_violin = specs_data * mapping(
+                :age => renamer(1 => "17-", 2 => "18-30", 3 => "31-50", 4 => "51-70", 5 => "70+"),
+                label.first => "";
+                color=:sex_male => renamer(0 => "Female", 1 => "Male") => "",
+                side=:sex_male => renamer(0 => "Female", 1 => "Male")  => "") *
+                visual(Violin, show_median=true, medianlinewidth=3)
 
 
-#         # Draw Figure
-#         draw!(fig[1, 1:6], specs_histogram; axis=(label, aspect=2.5,))
-#         draw!(fig[2, 1:6], specs_boxplot; axis=(xticklabelrotation=0.5,))
 
-#         # Supertitle
-#         fig[0, 1:6] = Label(fig, label, textsize=24, color=(:black, 1.0))
+    # Draw Figure
+    draw!(fig[1, 1], specs_density; axis=(title=label.second, titlesize=24, titlecolor=(:black, 1.0)))
+    draw!(fig[2, 1], specs_violin)
 
-#         # Legend
-#         # fig[end+1, 1:] = Legend(fig, [specs_boxplot, specs_boxplot], ["Female", "Male"])
-#         return fig
-
-#     elseif grouping == :income
-#         specs_boxplot *= mapping(layout=:income => renamer(1 => "BRL 0 - 178",
-#                                                            2 => "BRL 179 - 368",
-#                                                            3 => "BRL 369 - 1,008",
-#                                                            4 => "BRL 1,009 - 3,566",
-#                                                            5 => "BRL 3,557+"))
-
-#         # Draw Figure
-#         draw!(fig[1, 1:3], specs_histogram; axis=(aspect=2.5,))
-#         draw!(fig[2:3,1:3], specs_boxplot; axis=(xticklabelrotation=0.5,))
-
-#         # Supertitle
-#         fig[0, 1:3] = Label(fig, label, textsize=24, color= (:black, 1.0))
-#         return fig
-#     end
-# end
+    # Custom Legend
+    # Blue Female
+    # Orange Male
+    elem_1 = PolyElement(color=RGBAf0(0.0f0,0.44705883f0,0.69803923f0,1.0f0))
+    elem_2 = PolyElement(color=RGBAf0(0.9019608f0,0.62352943f0,0.0f0,1.0f0))
+    leg = fig[end+1, 1] = Legend(fig,[elem_1, elem_2], ["Female", "Male"];
+                                   tellwidth=false, tellheight=true, orientation=:horizontal)
+    return fig
+end
 
 function draw_figure(df::DataFrame, label::Pair{Symbol, String})
     # Problems with Int stuff
@@ -210,10 +198,10 @@ function draw_figure(df::DataFrame, label::Pair{Symbol, String})
     # Draw Figure
     draw!(fig[1, 1:2], specs_histogram)
     fig[2, 1:2] = Label(fig, "Expectation", textsize=24, color=(:black, 1.0))
-    draw!(fig[3, 1], specs_sex; axis=(xticklabelrotation=0.5,))
-    draw!(fig[3, 2], specs_age; axis=(xticklabelrotation=0.5,))
-    draw!(fig[4, 1], specs_marriage; axis=(xticklabelrotation=0.5,))
-    draw!(fig[4, 2], specs_income; axis=(xticklabelrotation=0.5,))
+    draw!(fig[3, 1], specs_sex; axis=(; xticklabelrotation=0.5))
+    draw!(fig[3, 2], specs_age; axis=(; xticklabelrotation=0.5))
+    draw!(fig[4, 1], specs_marriage; axis=(; xticklabelrotation=0.5))
+    draw!(fig[4, 2], specs_income; axis=(; xticklabelrotation=0.5))
 
     # Supertitle
     fig[0, 1:2] = Label(fig, label.second, textsize=36, color=(:black, 1.0))
@@ -223,6 +211,6 @@ function draw_figure(df::DataFrame, label::Pair{Symbol, String})
     return fig
 end
 
-function save_figure(fig::Figure, filename::String; quality=3)
-    save(joinpath(pwd(), "figures", "$(filename).png"), fig, px_per_unit=quality)
+function save_figure(fig::Figure, filename::String, prefix::String; quality=3)
+    save(joinpath(pwd(), "figures", "$(prefix)_$(filename).png"), fig, px_per_unit=quality)
 end
