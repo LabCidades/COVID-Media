@@ -4,16 +4,16 @@ file = joinpath(pwd(), "data", "responses_clean.csv")
 df = CSV.read(file, DataFrame)
 
 labels_list = [
-    :fnp => "Newspaper",
-    :ftv => "TV",
-    :fra => "Radio",
-    :fws => "Website",
-    :fsm => "Social Media",
-    :fmp => "Health Professionals",
-    :hb_b_pbe => "Healthy Behavior can Protect from COVID-19",
-    :hb_a_pbe => "Healthy Behavior can Keep Health\n after Reading Information from Media?",
-    :hb_b_se => "Confidence to Conduct Healthy Behaviours?",
-    :hb_a_se => "Confidence to Conduct Healthy Behaviours During Outbreak?"
+    :fnp => "fnp - Newspaper",
+    :ftv => "ftv - TV",
+    :fra => "fra - Radio",
+    :fws => "fws - Website",
+    :fsm => "fsm - Social Media",
+    :fmp => "fmp - Health Professionals",
+    :fear_mean => "Fear",
+    :risk_mean => "Perceived Risk",
+    :selfeff_mean => "Self-Efficacy",
+    :be_mean => "Protective  Behaviors"
 ]
 
 figures_summaries = map(x -> draw_figure(df, x), labels_list)

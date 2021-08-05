@@ -1,6 +1,5 @@
 using Serialization
 using Turing
-using FeatureTransforms
 using Dates: today
 using Statistics: mean, std
 
@@ -55,7 +54,7 @@ end
 # afra1 is yourself
 # afra2 is close relative
 
-model_mediation = mediation(df.ftv, df.fnp, df.fsm, df.afra1, df.be_mean, control_matrix)
+model_mediation = mediation(df.ftv, df.fnp, df.fsm, df.fear_mean, df.be_mean, control_matrix)
 chn_mediation = sample(model_mediation, NUTS(), MCMCThreads(), 2_000, 4)
 # chn_mediation = sample(model_mediation, NUTS(), 50) # test run
 

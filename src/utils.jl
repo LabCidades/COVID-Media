@@ -2,8 +2,6 @@ using AlgebraOfGraphics
 using CairoMakie
 using CSV
 using DataFrames
-using LinearAlgebra: Diagonal
-using Statistics: cov
 
 # Clean Data
 # Categorical Coding
@@ -13,6 +11,14 @@ function recode_hb(x::String)
            x == "Não concordo nem discordo" ? 0  :
            x == "Concordo"                  ? 1  :
            x == "Concordo fortemente"       ? 2  : missing
+end
+
+function recode_hb_inverse(x::Int)
+    return x == -2 ? 2  :
+           x == -1 ? 1  :
+           x == 0  ? 0  :
+           x == 1  ? -1 :
+           x == 2  ? -2 : missing
 end
 
 function recode_afra(x::String)
@@ -90,38 +96,36 @@ function clean_data!(df::DataFrame)
             names(df, r"^afra")    .=> x -> recode_afra.(x),
             names(df, r"^be_")     .=> x -> recode_be.(x),
             names(df, r"^f\w{2}")  .=> x -> recode_fmedia.(x),
-            names(df, r"^confi_")  .=> x -> recode_confi.(x),
+            names(df, r"^confi_")  .=> x -> recode_confi.(x);
             renamecols=false)
+    # Negative Coded Variables
+    transform!(df,
+               :hb_a_pba            => x -> recode_hb_inverse.(x);
+               renamecols=false)
+
     transform!(df,
             [:hb_b_pbe, :hb_b_se,
-             :hb_a_pbe, :hb_a_se]   => ByRow(+) => :hb_sum,
+             :hb_a_pbe, :hb_a_se]   => ByRow(+) => :fear_sum,
             names(df, r"^afra")     => ByRow(+) => :afra_sum,
-            names(df, r"^be_")      => ByRow(+) => :be_sum)
+            names(df, r"^be_")      => ByRow(+) => :be_sum,
+            [:hb_b_psu, :hb_b_pse,
+             :hb_a_psu, :hb_a_pse]  => ByRow(+) => :risk_sum,
+            [:hb_b_se, :hb_b_pse,
+             :hb_b_pbe, :hb_a_pba,
+             :hb_a_se]              => ByRow(+) => :selfeff_sum)
     transform!(df,
-            :hb_sum                 => ByRow(x -> x / 4)  => :hb_mean,
+            :fear_sum               => ByRow(x -> x / 4)                           => :fear_mean,
             :afra_sum               => ByRow(x -> x / length(names(df, r"^afra"))) => :afra_mean,
-            :be_sum                 => ByRow(x -> x / length(names(df, r"^be_")))  => :be_mean)
-end
-
-# Crombach
-
-"""
-Calculate Crombach's Alpha (1951) according to the Wikipedia formula:
-https://en.wikipedia.org/wiki/Cronbach%27s_alpha
-"""
-function crombach(covmatrix::AbstractMatrix{T}) where T <: Real
-    k = size(covmatrix, 2)
-    σ = sum(covmatrix)
-    σ_ij = sum(covmatrix - Diagonal(covmatrix)) / (k * (k - 1))
-    ρ = k^2 * σ_ij / σ
-    return ρ
+            :be_sum                 => ByRow(x -> x / length(names(df, r"^be_")))  => :be_mean,
+            :risk_sum               => ByRow(x -> x / 4)  => :risk_mean,
+            :selfeff_sum            => ByRow(x -> x / 5)  => :selfeff_mean)
 end
 
 # Data Vis
 
 function draw_violin(df::DataFrame, label::Pair{Symbol, String})
     # Problems with Int stuff
-    transform!(df, label.first => float, renamecols=false)
+    transform(df, label.first => float, renamecols=false)
 
     # Create Figure
     resolution = (800, 640)
