@@ -1,6 +1,4 @@
-using Serialization
 using Turing
-using Dates: today
 using Statistics: mean, std
 
 include(joinpath(pwd(), "src", "utils.jl"))
@@ -17,61 +15,86 @@ control_df.marriage_married = ifelse.(control_df.marriage .== 2, 1, 0)
 control_df.marriage_divorced_widow = ifelse.(control_df.marriage .== 3, 1, 0)
 control_matrix = select(control_df, Not(:marriage)) |> Matrix
 
-@model function mediation(tv, newspaper, socialmedia, fear, protective_behaviors, control_vars)
+@model function mediation_model(behaviors, media, fear, risk, selfeff, control)
     # priors
     # intercepts
     α_fear ~ LocationScale(mean(fear), 2.5 * std(fear), TDist(3))
-    α_protective_behaviors ~ LocationScale(mean(protective_behaviors), 2.5 * std(protective_behaviors), TDist(3))
+    α_behaviors ~ LocationScale(mean(behaviors), 2.5 * std(behaviors), TDist(3))
+
     # errors
     σ_fear ~ Exponential(1)
-    σ_protective_behaviors ~ Exponential(1)
+    σ_behaviors ~ Exponential(1)
+
     # control vars
-    β_control_vars ~ filldist(TDist(3), size(control_vars, 2))
+    β_control_fear ~ filldist(TDist(3), size(control, 2))
+    β_control_behaviors ~ filldist(TDist(3), size(control, 2))
 
     # coefficients
-    media_exposure = tv + newspaper + socialmedia / 3
-    β_media_exposure_direct ~ TDist(3)
-    β_media_exposure_indirect ~ TDist(3)
-    β_fear ~ TDist(3)
+    β_fear ~ filldist(TDist(3), 2)
+    β_behaviors ~ filldist(TDist(3), 3)
 
     # likelihood
-    fear ~ MvNormal(α_fear .+ β_media_exposure_indirect * media_exposure, σ_fear)
-    protective_behaviors ~ MvNormal(α_protective_behaviors .+
-                                    β_media_exposure_direct * media_exposure .+
-                                    β_fear * fear .+
-                                    control_vars * β_control_vars,
-                                    σ_protective_behaviors)
+    # X matrices
+    X_fear = Matrix([media risk ])
+    X_behaviors = Matrix([media fear selfeff])
 
-    return (; α_fear, α_protective_behaviors,
-            σ_fear, σ_protective_behaviors,
-            media_exposure,
-            β_media_exposure_direct, β_media_exposure_indirect,
-            β_fear,
-            β_control_vars,
-            fear, protective_behaviors)
+    # dependent vars
+    fear ~ MvNormal(α_fear .+
+                    X_fear * β_fear .+
+                    control * β_control_fear, σ_fear)
+    behaviors ~ MvNormal(α_behaviors .+
+                         X_behaviors * β_behaviors .+
+                         control * β_control_behaviors,
+                         σ_behaviors)
+
+    return (; media_direct = β_behaviors[1],                               # the direct path - c'
+              media_indirect = β_fear[1] * β_behaviors[2],                 # the indirect path - ab
+              media_total = β_behaviors[1] + (β_fear[1] * β_behaviors[2])) # the total path - c' + ab
 end
 
-# afra1 is yourself
-# afra2 is close relative
+@model function full_model(behaviors, media, fear, risk, selfeff, control)
+    # priors
+    # intercepts
+    α_fear ~ LocationScale(mean(fear), 2.5 * std(fear), TDist(3))
+    α_behaviors ~ LocationScale(mean(behaviors), 2.5 * std(behaviors), TDist(3))
 
-model_mediation = mediation(df.ftv, df.fnp, df.fsm, df.fear_mean, df.be_mean, control_matrix)
-chn_mediation = sample(model_mediation, NUTS(), MCMCThreads(), 2_000, 4)
-# chn_mediation = sample(model_mediation, NUTS(), 50) # test run
+    # errors
+    σ_fear ~ Exponential(1)
+    σ_behaviors ~ Exponential(1)
 
-# ab is β_fear * β_media_exposure_indirect
-# c' is β_media_exposure_direct
-ab_quantile = DataFrame(quantile(chn_mediation[[:β_fear, :β_media_exposure_indirect, :β_media_exposure_direct]]))
-# row 2 is β_media_exposure_indirect and row 3 is β_fear
-push!(ab_quantile, (
-    :β_media_exposure_indirect_total,
-    ab_quantile[2, 2] * ab_quantile[3, 2],
-    ab_quantile[2, 3] * ab_quantile[3, 3],
-    ab_quantile[2, 4] * ab_quantile[3, 4],
-    ab_quantile[2, 5] * ab_quantile[3, 5],
-    ab_quantile[2, 6] * ab_quantile[3, 6])
-)
+    # control vars
+    β_control_fear ~ filldist(TDist(3), size(control, 2))
+    β_control_behaviors ~ filldist(TDist(3), size(control, 2))
 
-filter!(row -> row.parameters ∈ [:β_media_exposure_direct, :β_media_exposure_indirect_total], ab_quantile)
+    # coefficients
+    β_fear ~ filldist(TDist(3), 3)
+    β_behaviors ~ filldist(TDist(3), 3)
 
-# Saving chains
-serialize(joinpath(pwd(), "chains", "mediation_$(today()).jls"), chn_mediation)
+    # likelihood
+    # X matrices
+    X_fear = Matrix([media risk (media .* risk)])
+    X_behaviors = Matrix([fear selfeff (fear .* selfeff)])
+
+    # dependent vars
+    fear ~ MvNormal(α_fear .+
+                    X_fear * β_fear .+
+                    control * β_control_fear, σ_fear)
+    behaviors ~ MvNormal(α_behaviors .+
+                         X_behaviors * β_behaviors .+
+                         control * β_control_behaviors,
+                         σ_behaviors)
+
+    return (; fear, behaviors) # for predictive checks
+end
+
+# instantiate models
+# mediation
+mediation_all = mediation_model(df.be_mean, (df.ftv .+ df.fnp .+ df.fsm ./ 3), df.fear_mean, df.risk_mean, df.selfeff_mean, control_matrix)
+mediation_tv = mediation_model(df.be_mean, df.ftv, df.fear_mean, df.risk_mean, df.selfeff_mean, control_matrix)
+mediation_np = mediation_model(df.be_mean, df.fnp, df.fear_mean, df.risk_mean, df.selfeff_mean, control_matrix)
+mediation_sm = mediation_model(df.be_mean, df.fsm, df.fear_mean, df.risk_mean, df.selfeff_mean, control_matrix)
+# full
+full_all = full_model(df.be_mean, (df.ftv .+ df.fnp .+ df.fsm ./ 3), df.fear_mean, df.risk_mean, df.selfeff_mean, control_matrix)
+full_tv = full_model(df.be_mean, df.ftv, df.fear_mean, df.risk_mean, df.selfeff_mean, control_matrix)
+full_np = full_model(df.be_mean, df.fnp, df.fear_mean, df.risk_mean, df.selfeff_mean, control_matrix)
+full_sm = full_model(df.be_mean, df.fsm, df.fear_mean, df.risk_mean, df.selfeff_mean, control_matrix)
