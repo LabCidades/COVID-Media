@@ -1,11 +1,12 @@
 using AlgebraOfGraphics
 using CairoMakie
+using ColorTypes
 using CSV
 using DataFrames
 
 # Clean Data
 # Categorical Coding
-function recode_hb(x::String)
+function recode_hb(x::AbstractString)
     return x == "Discordo fortemente"       ? -2 :
            x == "Discordo"                  ? -1 :
            x == "Não concordo nem discordo" ? 0  :
@@ -21,14 +22,14 @@ function recode_hb_inverse(x::Int)
            x == 2  ? -2 : missing
 end
 
-function recode_afra(x::String)
+function recode_afra(x::AbstractString)
     return x == "Não estou com medo"   ? 0 :
            x == "Um pouco amedrontado" ? 1 :
            x == "Amedrontado"          ? 2 :
            x == "Bastante amedrontado" ? 3 : missing
 end
 
-function recode_be(x::String)
+function recode_be(x::AbstractString)
     return x == "Nunca"          ? 0 :
            x == "Pouco"          ? 1 :
            x == "Algumas vezes"  ? 2 :
@@ -36,7 +37,7 @@ function recode_be(x::String)
            x == "Sempre"         ? 4 : missing
 end
 
-function recode_fmedia(x::String)
+function recode_fmedia(x::AbstractString)
     return x == "Nunca"          ? 0 :
            x == "Raramente"      ? 1 :
            x == "Algumas vezes"  ? 2 :
@@ -44,14 +45,14 @@ function recode_fmedia(x::String)
            x == "Sempre"         ? 4 : missing
 end
 
-function recode_confi(x::String)
+function recode_confi(x::AbstractString)
     return x == "Totalmente discrente"   ? 0 :
            x == "Com um pouco de dúvida" ? 1 :
            x == "Confiante"              ? 2 :
            x == "Muito confiante"        ? 3 : missing
 end
 
-function recode_age(x::String)
+function recode_age(x::AbstractString)
     return x == "Abaixo de 17 anos" ? 1 :
            x == "18-30 anos"        ? 2 :
            x == "31-50 anos"        ? 3 :
@@ -59,14 +60,14 @@ function recode_age(x::String)
            x == "Acima de 70 anos"  ? 5 : missing
 end
 
-function recode_mariage(x::String)
+function recode_mariage(x::AbstractString)
     return x == "Solteiro(a)"                  ? 1 :
            x == "Casado(a) ou União Estável"   ? 2 :
            x == "Divorciado(a) ou Separado(a)" ? 3 :
            x == "Viúvo(a)"                     ? 3 : missing
 end
 
-function recode_income(x::String)
+function recode_income(x::AbstractString)
     return x == "Até R\$ 178"              ? 1 :
            x == "De R\$ 179 a R\$ 368"     ? 2 :
            x == "De R\$ 369 a R\$ 1.008"   ? 3 :
@@ -104,9 +105,7 @@ function clean_data!(df::DataFrame)
                renamecols=false)
 
     transform!(df,
-            [:hb_b_pbe, :hb_b_se,
-             :hb_a_pbe, :hb_a_se]   => ByRow(+) => :fear_sum,
-            names(df, r"^afra")     => ByRow(+) => :afra_sum,
+            names(df, r"^afra")     => ByRow(+) => :fear_sum,
             names(df, r"^be_")      => ByRow(+) => :be_sum,
             [:hb_b_psu, :hb_b_pse,
              :hb_a_psu, :hb_a_pse]  => ByRow(+) => :risk_sum,
@@ -114,8 +113,7 @@ function clean_data!(df::DataFrame)
              :hb_b_pbe, :hb_a_pba,
              :hb_a_se]              => ByRow(+) => :selfeff_sum)
     transform!(df,
-            :fear_sum               => ByRow(x -> x / 4)                           => :fear_mean,
-            :afra_sum               => ByRow(x -> x / length(names(df, r"^afra"))) => :afra_mean,
+            :fear_sum               => ByRow(x -> x / length(names(df, r"^afra"))) => :fear_mean,
             :be_sum                 => ByRow(x -> x / length(names(df, r"^be_")))  => :be_mean,
             :risk_sum               => ByRow(x -> x / 4)  => :risk_mean,
             :selfeff_sum            => ByRow(x -> x / 5)  => :selfeff_mean)
@@ -155,8 +153,8 @@ function draw_violin(df::DataFrame, label::Pair{Symbol, String})
     # Orange Male
     elem_1 = PolyElement(color=RGBAf0(0.0f0,0.44705883f0,0.69803923f0,1.0f0))
     elem_2 = PolyElement(color=RGBAf0(0.9019608f0,0.62352943f0,0.0f0,1.0f0))
-    leg = fig[end+1, 1] = Legend(fig,[elem_1, elem_2], ["Female", "Male"];
-                                   tellwidth=false, tellheight=true, orientation=:horizontal)
+    fig[end+1, 1] = Legend(fig,[elem_1, elem_2], ["Female", "Male"];
+                           tellwidth=false, tellheight=true, orientation=:horizontal)
     return fig
 end
 

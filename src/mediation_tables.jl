@@ -12,15 +12,12 @@ function make_df(x::Matrix)
 end
 
 function make_summary(x::AbstractMatrix, title::AbstractString)
-    df = reduce(vcat, DataFrame(x[:, i]) for i ∈ 1:size(x, 2))
-    summ = describe(df, :mean, :std, :median,
-                        (x -> quantile(x, 0.025)) => "2.5%",
-                        (x -> quantile(x, 0.975)) => "97.5%")
+    summ = make_df(x)
     return pretty_table(summ; nosubheader=true, formatters=ft_round(3), title=title)
 end
 
 # Loading chains
-date = "2021-08-07"
+date = "2021-09-22"
 mediation_chn_all = deserialize(joinpath(pwd(), "chains", "mediation_all_$date.jls"))
 mediation_chn_tv = deserialize(joinpath(pwd(), "chains", "mediation_tv_$date.jls"))
 mediation_chn_np = deserialize(joinpath(pwd(), "chains", "mediation_np_$date.jls"))

@@ -40,7 +40,7 @@ mediation_chn_tv = deserialize(joinpath(pwd(), "chains", "mediation_tv_$date.jls
 mediation_chn_np = deserialize(joinpath(pwd(), "chains", "mediation_np_$date.jls"))
 mediation_chn_sm = deserialize(joinpath(pwd(), "chains", "mediation_sm_$date.jls"))
 # full
-full_chn_all = deserialize(joinpath(pwd(), "chains", "full_all_$date.jls"))
+full_chn_all = deserialize(joinpath(pwd(), "chains", "full_all_$d.jls"))
 full_chn_tv = deserialize(joinpath(pwd(), "chains", "full_tv_$date.jls"))
 full_chn_np = deserialize(joinpath(pwd(), "chains", "full_np_$date.jls"))
 full_chn_sm = deserialize(joinpath(pwd(), "chains", "full_sm_$date.jls"))

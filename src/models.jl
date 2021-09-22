@@ -1,3 +1,5 @@
+using CSV
+using DataFrames
 using Turing
 using Statistics: mean, std
 
@@ -15,86 +17,84 @@ control_df.marriage_married = ifelse.(control_df.marriage .== 2, 1, 0)
 control_df.marriage_divorced_widow = ifelse.(control_df.marriage .== 3, 1, 0)
 control_matrix = select(control_df, Not(:marriage)) |> Matrix
 
-@model function mediation_model(behaviors, media, fear, risk, selfeff, control)
+@model function mediation_model(dependent, mediator, indep, control)
     # priors
     # intercepts
-    α_fear ~ LocationScale(mean(fear), 2.5 * std(fear), TDist(3))
-    α_behaviors ~ LocationScale(mean(behaviors), 2.5 * std(behaviors), TDist(3))
+    α_med ~ LocationScale(mean(mediator), 2.5 * std(mediator), TDist(3))
+    α_dep ~ LocationScale(mean(dependent), 2.5 * std(dependent), TDist(3))
 
     # errors
-    σ_fear ~ Exponential(1)
-    σ_behaviors ~ Exponential(1)
+    σ_med ~ Exponential(1)
+    σ_dep ~ Exponential(1)
 
     # control vars
-    β_control_fear ~ filldist(TDist(3), size(control, 2))
-    β_control_behaviors ~ filldist(TDist(3), size(control, 2))
+    β_control_med ~ filldist(TDist(3), size(control, 2))
+    β_control_dep ~ filldist(TDist(3), size(control, 2))
 
     # coefficients
-    β_fear ~ filldist(TDist(3), 2)
-    β_behaviors ~ filldist(TDist(3), 3)
+    β_med ~ TDist(3)
+    β_dep ~ TDist(3)
 
     # likelihood
-    # X matrices
-    X_fear = Matrix([media risk ])
-    X_behaviors = Matrix([media fear selfeff])
+    mediator ~ MvNormal(α_med .+ indep * β_med .+ control * β_control_med, σ_med)
+    dependent ~ MvNormal(α_dep .+ indep * β_dep .+ control * β_control_dep, σ_dep)
 
-    # dependent vars
-    fear ~ MvNormal(α_fear .+
-                    X_fear * β_fear .+
-                    control * β_control_fear, σ_fear)
-    behaviors ~ MvNormal(α_behaviors .+
-                         X_behaviors * β_behaviors .+
-                         control * β_control_behaviors,
-                         σ_behaviors)
-
-    return (; media_direct = β_behaviors[1],                               # the direct path - c'
-              media_indirect = β_fear[1] * β_behaviors[2],                 # the indirect path - ab
-              media_total = β_behaviors[1] + (β_fear[1] * β_behaviors[2])) # the total path - c' + ab
+    # Mediation Tests
+    # the direct path - c'
+    direct = abs(β_dep)
+     # the indirect path - ab
+    indirect = abs(β_med * β_dep)
+    # the total path - c' + ab
+    total = direct + indirect
+    
+    return (; direct, indirect, total)
 end
 
-@model function full_model(behaviors, media, fear, risk, selfeff, control)
+@model function full_model(dependent, X, control)
     # priors
-    # intercepts
-    α_fear ~ LocationScale(mean(fear), 2.5 * std(fear), TDist(3))
-    α_behaviors ~ LocationScale(mean(behaviors), 2.5 * std(behaviors), TDist(3))
+    # intercept
+    α ~ LocationScale(mean(dependent), 2.5 * std(dependent), TDist(3))
 
-    # errors
-    σ_fear ~ Exponential(1)
-    σ_behaviors ~ Exponential(1)
+    # error
+    σ ~ Exponential(1)
 
     # control vars
-    β_control_fear ~ filldist(TDist(3), size(control, 2))
-    β_control_behaviors ~ filldist(TDist(3), size(control, 2))
+    β_control ~ filldist(TDist(3), size(control, 2))
 
     # coefficients
-    β_fear ~ filldist(TDist(3), 3)
-    β_behaviors ~ filldist(TDist(3), 3)
+    β ~ filldist(TDist(3), size(X, 2))
 
     # likelihood
-    # X matrices
-    X_fear = Matrix([media risk (media .* risk)])
-    X_behaviors = Matrix([fear selfeff (fear .* selfeff)])
-
-    # dependent vars
-    fear ~ MvNormal(α_fear .+
-                    X_fear * β_fear .+
-                    control * β_control_fear, σ_fear)
-    behaviors ~ MvNormal(α_behaviors .+
-                         X_behaviors * β_behaviors .+
-                         control * β_control_behaviors,
-                         σ_behaviors)
-
-    return (; fear, behaviors) # for predictive checks
+    dependent ~ MvNormal(α .+ X * β .+ control * β_control, σ)
+    return (; dependent) # for predictive checks
 end
 
 # instantiate models
 # mediation
-mediation_all = mediation_model(df.be_mean, (df.ftv .+ df.fnp .+ df.fsm ./ 3), df.fear_mean, df.risk_mean, df.selfeff_mean, control_matrix)
-mediation_tv = mediation_model(df.be_mean, df.ftv, df.fear_mean, df.risk_mean, df.selfeff_mean, control_matrix)
-mediation_np = mediation_model(df.be_mean, df.fnp, df.fear_mean, df.risk_mean, df.selfeff_mean, control_matrix)
-mediation_sm = mediation_model(df.be_mean, df.fsm, df.fear_mean, df.risk_mean, df.selfeff_mean, control_matrix)
+mediation_all = mediation_model(df.be_mean, df.fear_mean, (df.ftv .+ df.fnp .+ df.fsm ./ 3), control_matrix)
+mediation_tv = mediation_model(df.be_mean, df.fear_mean, df.ftv, control_matrix)
+mediation_np = mediation_model(df.be_mean, df.fear_mean, df.fnp, control_matrix)
+mediation_sm = mediation_model(df.be_mean, df.fear_mean, df.fsm, control_matrix)
+
+function make_X(indep::Symbol; df::DataFrame=df, type::AbstractString="single")
+    # X Matrix
+    # Independent + Moderators
+    # Hierarchy Principle: both main effects and also interactions
+    if type == "single"
+        indep = df[!, indep]
+    elseif type == "all"
+        indep = (df.ftv .+ df.fnp .+ df.fsm) ./ 3
+    end
+    moderator_vars = [:fear_mean, :risk_mean, :selfeff_mean]
+    df_moderator = select(df, moderator_vars)
+    moderator_matrix = select(df, moderator_vars) |> Matrix
+    interaction_matrix = transform(df_moderator, moderator_vars .=> x -> x .* indep;
+                                   renamecols=false) |> Matrix
+    return hcat(Vector(indep), moderator_matrix, interaction_matrix)
+end
+
 # full
-full_all = full_model(df.be_mean, (df.ftv .+ df.fnp .+ df.fsm ./ 3), df.fear_mean, df.risk_mean, df.selfeff_mean, control_matrix)
-full_tv = full_model(df.be_mean, df.ftv, df.fear_mean, df.risk_mean, df.selfeff_mean, control_matrix)
-full_np = full_model(df.be_mean, df.fnp, df.fear_mean, df.risk_mean, df.selfeff_mean, control_matrix)
-full_sm = full_model(df.be_mean, df.fsm, df.fear_mean, df.risk_mean, df.selfeff_mean, control_matrix)
+full_all = full_model(df.be_mean, make_X(:all; type="all"), control_matrix)
+full_tv = full_model(df.be_mean, make_X(:ftv), control_matrix)
+full_np = full_model(df.be_mean, make_X(:fnp), control_matrix)
+full_sm = full_model(df.be_mean, make_X(:fsm), control_matrix)
