@@ -1,0 +1,23 @@
+digraph estatistica_inferencial {
+  forcelabels=true;
+  graph [overlap=false,
+  	 dpi=300,
+  	 bgcolor="transparent",
+	 esep=8,
+         fontsize=12]
+  node [shape=oval,
+  	width=1.2,
+	height=0.6,
+	fixedsize=shape,
+        fontname=Helvetica]
+  Fear      [label="Fear"]
+  Selfeff   [label="Self-\nEfficacy"]
+  Behaviors [label="Protective\nBehaviors"]
+  Media     [label="Media\nExposure"]
+  mod       [label="", fixedsize="false", width=0, height=0, shape=none]
+  Fear -> mod [arrowhead=none]
+  mod -> Selfeff
+  Selfeff -> Behaviors
+  Media -> mod
+ {rank=same; Fear; mod; Selfeff; Behaviors};
+}
