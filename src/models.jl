@@ -71,10 +71,11 @@ end
 
 # instantiate models
 # mediation
-mediation_all = mediation_model(df.be_mean, df.fear_mean, (df.ftv .+ df.fnp .+ df.fsm ./ 3), control_matrix)
-mediation_tv = mediation_model(df.be_mean, df.fear_mean, df.ftv, control_matrix)
-mediation_np = mediation_model(df.be_mean, df.fear_mean, df.fnp, control_matrix)
-mediation_sm = mediation_model(df.be_mean, df.fear_mean, df.fsm, control_matrix)
+# mediation_all = mediation_model(df.be_mean, df.fear_mean, (df.ftv .+ df.fnp .+ df.fsm ./ 3), control_matrix)
+# mediation_tv = mediation_model(df.be_mean, df.fear_mean, df.ftv, control_matrix)
+# mediation_np = mediation_model(df.be_mean, df.fear_mean, df.fnp, control_matrix)
+# mediation_sm = mediation_model(df.be_mean, df.fear_mean, df.fsm, control_matrix)
+mediation = mediation_model(df.be_mean, df.selfeff_mean, df.fear_mean, control_matrix)
 
 function make_X(indep::Symbol; df::DataFrame=df, type::AbstractString="single")
     # X Matrix
@@ -94,7 +95,8 @@ function make_X(indep::Symbol; df::DataFrame=df, type::AbstractString="single")
 end
 
 # full
-full_all = full_model(df.be_mean, make_X(:all; type="all"), control_matrix)
-full_tv = full_model(df.be_mean, make_X(:ftv), control_matrix)
-full_np = full_model(df.be_mean, make_X(:fnp), control_matrix)
-full_sm = full_model(df.be_mean, make_X(:fsm), control_matrix)
+# full_all = full_model(df.be_mean, make_X(:all; type="all"), control_matrix)
+# full_tv = full_model(df.be_mean, make_X(:ftv), control_matrix)
+# full_np = full_model(df.be_mean, make_X(:fnp), control_matrix)
+# full_sm = full_model(df.be_mean, make_X(:fsm), control_matrix)
+# full = 
