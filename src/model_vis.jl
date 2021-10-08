@@ -11,57 +11,49 @@ function save_figure(fig::Union{Figure, AlgebraOfGraphics.FigureGrid}, filename:
 end
 
 # Loading chains
-date = "2021-09-27"
-# full
-full_chn_all = deserialize(joinpath(pwd(), "chains", "full_all_$date.jls"))
-full_chn_tv = deserialize(joinpath(pwd(), "chains", "full_tv_$date.jls"))
-full_chn_np = deserialize(joinpath(pwd(), "chains", "full_np_$date.jls"))
-full_chn_sm = deserialize(joinpath(pwd(), "chains", "full_sm_$date.jls"))
+date = "2021-10-08"
+# m1
+chn_m1 = deserialize(joinpath(pwd(), "chains", "m1_$date.jls"))
 
-# subset chains only for β coeffs
-subset_chn_all = MCMCChains.get_sections(full_chn_all, :parameters)[["β[$i]" for i ∈ 1:7]]
-subset_chn_tv = MCMCChains.get_sections(full_chn_tv, :parameters)[["β[$i]" for i ∈ 1:7]]
-subset_chn_np = MCMCChains.get_sections(full_chn_np, :parameters)[["β[$i]" for i ∈ 1:7]]
-subset_chn_sm = MCMCChains.get_sections(full_chn_sm, :parameters)[["β[$i]" for i ∈ 1:7]]
-df_all = DataFrame(subset_chn_all)
-df_tv = DataFrame(subset_chn_tv)
-df_np = DataFrame(subset_chn_np)
-df_sm = DataFrame(subset_chn_sm)
-df_all[!, :model] .= "all"
-df_tv[!, :model] .= "tv"
-df_np[!, :model] .= "np"
-df_sm[!, :model] .= "sm"
+# subset chain only for β coeffs
+subset_chn_m1 = MCMCChains.get_sections(chn_m1, :parameters)
+df = select(DataFrame(subset_chn_m1), Not([:α, :σ]))
+# df_all = DataFrame(subset_chn_all)
+# df_tv = DataFrame(subset_chn_tv)
+# df_np = DataFrame(subset_chn_np)
+# df_sm = DataFrame(subset_chn_sm)
+# df_all[!, :model] .= "all"
+# df_tv[!, :model] .= "tv"
+# df_np[!, :model] .= "np"
+# df_sm[!, :model] .= "sm"
 
-df = vcat(df_all, df_tv, df_np, df_sm)
-long_df = stack(df, Between("β[1]", "β[7]"); variable_name=:parameter, value_name=:value)
-
-xticks = ["media", "fear", "risk", "selfeff", "media*fear", "media*risk", "media*selfeff"]
+# df = vcat(df_all, df_tv, df_np, df_sm)
+# iteration and chains are columns 1 and 2
+long_df = stack(df, 3:ncol(df); variable_name=:parameter, value_name=:value)
 
 plt_violin = data(long_df) *
                   mapping(:parameter,
-                          :value;
-                          color=:model,
-                          dodge=:model) *
+                          :value)
+                          # color=:model,
+                          # dodge=:model) *
                   visual(Violin, show_median=true, width=0.95)
 
 fig_violin = draw(plt_violin;
                   axis=(;
-                        xticks=(1:7, xticks),
                         xticklabelrotation=π/4,
-                        yticks=-0.2:0.05:0.2))
+                        yticks=-3.0:0.5:3.0))
 
 plt_boxplot = data(long_df) *
                    mapping(:parameter,
-                           :value;
-                           color=:model,
-                           dodge=:model) *
+                           :value)
+                           # color=:model,
+                           # dodge=:model) *
                   visual(BoxPlot)
 
 fig_boxplot = draw(plt_boxplot;
                    axis=(;
-                         xticks=(1:7, xticks),
                          xticklabelrotation=π/4,
-                         yticks=-0.2:0.05:0.2))
+                         yticks=-3.0:0.5:3.0))
 
 save_figure(fig_violin, "violin", "parameters")
 save_figure(fig_boxplot, "boxplot", "parameters")

@@ -119,6 +119,11 @@ function clean_data!(df::DataFrame)
             :selfeff_sum            => ByRow(x -> x / 5)  => :selfeff_mean)
 end
 
+# Standard Scaler to μ=0 σ=1
+function std_scaler(x::AbstractVector)
+    return (x .- mean(x)) ./ std(x)
+end
+
 # Data Vis
 
 function draw_violin(df::DataFrame, label::Pair{Symbol, String})

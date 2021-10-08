@@ -1,4 +1,4 @@
-digraph estatistica_inferencial {
+digraph graphical_model {
   forcelabels=true;
   graph [overlap=false,
   	 dpi=300,
@@ -10,14 +10,13 @@ digraph estatistica_inferencial {
 	height=0.6,
 	fixedsize=shape,
         fontname=Helvetica]
+  Gender    [label="Gender"]
+  Age       [label="Age"]
   Fear      [label="Fear"]
   Selfeff   [label="Self-\nEfficacy"]
   Behaviors [label="Protective\nBehaviors"]
   Media     [label="Media\nExposure"]
-  mod       [label="", fixedsize="false",width=0,height=0,shape=none]
-  Fear -> mod [arrowhead=none]
-  mod -> Selfeff
-  Selfeff -> Behaviors
-  Media -> mod
- {rank=same; Fear; mod; Selfeff; Behaviors};
+
+  {Gender Age} -> {Media Fear}
+  {Media Fear Selfeff} -> Behaviors
 }
