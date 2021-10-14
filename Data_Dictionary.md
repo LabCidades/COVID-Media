@@ -71,31 +71,20 @@
 
 ## Variables
 
+![framework](tex/framework.png)
+
 - **Dependent**: `behaviors` -- mean of all `be_01` to `be_20` variables
 - **Independent**:
-    - `media` -- $\beta$`[1]`:
-        - `all`: $\frac{\texttt{ftv} + \texttt{fnp} + \texttt{fsm}}{3}$
-        - `ftv`
-        - `fnp`
-        - `fsm`
-    - `fear` -- mean of `afra1` and `afra2` -- $\beta$`[2]`
-    - `risk` -- mean of `hb_b_psu`, `hb_b_pse`, `hb_a_psu` and `hb_a_pse` -- $\beta$`[3]`
-    - `selfeff` -- mean of `hb_b_se`, `hb_b_pse`, `hb_b_pbe`, `hb_a_pba` and `hb_a_se` -- $\beta$`[4]`
-- **Moderator**:
-    - `media * fear` -- $\beta$`[5]`
-    - `media * risk` -- $\beta$`[6]`
-    - `media * selfeff` -- $\beta$`[7]`
+    - `media` -- $\beta$`_indep`:
+        - `ftv` -- $\alpha$`_j[1]`
+        - `fnp` -- $\alpha$`_j[2]`
+        - `fsm` -- $\alpha$`_j[3]`
+    - `fear` -- mean of `afra1` and `afra2` (not using at the moment)
+- **Mediator**:
+    - `risk` -- mean of `hb_b_psu`, `hb_b_pse`, `hb_a_psu` and `hb_a_pse` -- $\beta$`_med`
 - **Control**:
     - `age` -- Numeric -- $\beta$`_control[1]`
     - `sex_male` -- Dummy -- $\beta$`_control[2]`
-    - `income` -- Ordinal -- $\beta$`_control[3]`:
-        - Até R\$ 178 -- `1`
-        - De R\$ 179 a R\$ 368 -- `2`
-        - De R\$ 369 a R\$ 1.008 -- `3`
-        - De R\$ 1.009 a R\$ 3.566 -- `4`
-        - Acima de R\$ 3.566 -- `5`
-    - `marriage` -- Dummy:
-        - `marriage_single` -- Basal Class (`0` in all other dummies)
-        - `marriage_married` -- Dummy -- $\beta$`_control[4]`
-        - `marriage_divorced_widow` -- Dummy -- $\beta$`_control[5]`
+    - `selfeff` -- mean of `hb_b_se`, `hb_b_pse`, `hb_b_pbe`, `hb_a_pba` and `hb_a_se` -- $\beta$`_control[3]`
 
+**Observation**: all variables were scaled to standard Normal with $\mu=0$ and $\sigma=1$.

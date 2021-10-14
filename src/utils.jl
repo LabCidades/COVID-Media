@@ -120,7 +120,6 @@ function clean_data!(df::DataFrame)
 end
 
 # Data Vis
-
 function draw_violin(df::DataFrame, label::Pair{Symbol, String})
     # Problems with Int stuff
     transform(df, label.first => float, renamecols=false)
