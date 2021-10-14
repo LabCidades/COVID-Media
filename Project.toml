@@ -20,7 +20,6 @@ Turing = "fce5fe82-541a-59a6-adf8-730c64b5f9a0"
 [compat]
 AlgebraOfGraphics = "0.5"
 CSV = "0.9"
-CairoMakie = "0.6"
 CategoricalArrays = "0.10"
 ColorTypes = "0.11"
 Colors = "0.12"
