@@ -1,5 +1,5 @@
 using Serialization
-using PrettyTables
+using Turing
 using Dates: today
 
 include(joinpath(pwd(), "src", "models.jl"))
@@ -7,15 +7,19 @@ include(joinpath(pwd(), "src", "models.jl"))
 numsamples = 2_000
 nchains = 4
 
-# test run model
+# test run models
+test_mediation = sample(mediation, NUTS(), 50)
 test_full = sample(full, NUTS(), 50)
 
 # run model - WARNING! this might take a while
-# 900s to 1,000s
+# 300s to 400s
+chn_mediation = sample(mediation, NUTS(), MCMCThreads(), numsamples, nchains)
 chn_full = sample(full, NUTS(), MCMCThreads(), numsamples, nchains)
 
 # Saving chains
-serialize(joinpath(pwd(), "chains", "model_$(today()).jls"), chn_full)
+serialize(joinpath(pwd(), "chains", "mediation_$(today()).jls"), chn_mediation)
+serialize(joinpath(pwd(), "chains", "full_$(today()).jls"), chn_full)
 
 # all rhats okay
+summarystats(chn_mediation)
 summarystats(chn_full)
