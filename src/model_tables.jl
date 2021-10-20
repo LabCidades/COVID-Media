@@ -24,7 +24,7 @@ function make_df(x::Matrix; type, dependent=false)
             [:x1, :x2, :x3, :x4] .=> ["α_med_j[1]", "α_med_j[2]", "α_med_j[3]", "α_med_j[4]"],
         )
         select!(df, 1:3, names(df, r"^β_control"), names(df, r"^α"), :)
-        select!(df, Not([:x1, :x2, :x3]))
+        select!(df, Not([:x1, :x2, :x3, :x4]))
     elseif type == "full"
         df = select(
             transform(df, :β_control => AsTable),

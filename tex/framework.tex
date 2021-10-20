@@ -26,14 +26,14 @@
 \begin{tikzpicture}
 		    
 	\node [var] (media) {media\\exposure};
-	\node [var, right=of media] (risk) {risk\\perception};
-	\node [var, right=of risk] (behavior) {adoption of\\protective\\behaviors};
+	\node [var, right=of media] (fear) {fear\\perception};
+	\node [var, right=of fear] (behavior) {adoption of\\protective\\behaviors};
 
-	\path (media) edge node  {$+$ \\[0.5em]} (risk);
-	\path (risk) edge node  {$+$ \\[0.5em]} (behavior);
+	\path (media) edge node  {$+$ \\[0.5em]} (fear);
+	\path (fear) edge node  {$+$ \\[0.5em]} (behavior);
 
 	% control vars
-	\node [matrix, below=2 of risk, anchor=center] (control) {
+	\node [matrix, below=2 of fear, anchor=center] (control) {
 		\node{\textbf{Control Variables}}; \\
 		\node [var] (selfeff) {Self-Efficacy}; &
 		\node [var] (age) {Age}; &
