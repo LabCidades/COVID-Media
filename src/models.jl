@@ -18,7 +18,7 @@ df_long = CSV.read(file_long, DataFrame)
 # fsm is 3
 transform!(
     df_long,
-    :media_type => x -> categorical(x; levels=["ftv", "fnp", "fsm"]);
+    :media_type => x -> categorical(x; levels=["ftv", "fnp", "fsm", "fmp"]);
     renamecols=false,
 )
 transform!(df_long, :media_type => ByRow(levelcode) => :media_idx)
@@ -29,12 +29,26 @@ function std_scaler(x::AbstractVector)
 end
 transform!(
     df,
-    [:be_mean, :ftv, :fnp, :fsm, :sex_male, :age, :fear_mean, :risk_mean, :selfeff_mean] .=>
+    [
+        :be_mean,
+        :ftv,
+        :fnp,
+        :fsm,
+        :fmp,
+        :hmtime,
+        :sex_male,
+        :age,
+        :fear_mean,
+        :risk_mean,
+        :selfeff_mean,
+    ] .=>
         std_scaler .=> [
             :be_mean_std,
             :ftv_std,
             :fnp_std,
             :fsm_std,
+            :fmp_std,
+            :hmtime_std,
             :sex_male_std,
             :age_std,
             :fear_mean_std,
@@ -44,9 +58,19 @@ transform!(
 )
 transform!(
     df_long,
-    [:be_mean, :sex_male, :age, :fear_mean, :media_val, :risk_mean, :selfeff_mean] .=>
+    [
+        :be_mean,
+        :hmtime,
+        :sex_male,
+        :age,
+        :fear_mean,
+        :media_val,
+        :risk_mean,
+        :selfeff_mean,
+    ] .=>
         std_scaler .=> [
             :be_mean_std,
+            :hmtime_std,
             :sex_male_std,
             :age_std,
             :fear_mean_std,
@@ -86,7 +110,34 @@ control_matrix_long = select(df_long, control_vars) |> Matrix
     return (; direct, indirect, total, dependent) # for predictive checks
 end
 
-@model function full_model(
+@model function full_model(dependent, mediator, indep, control)
+    # priors
+    # intercepts
+    α_med ~ TDist(3)
+    α_dep ~ TDist(3)
+    # errors
+    σ_med ~ Exponential(1)
+    σ_dep ~ Exponential(1)
+    # coefficients
+    β_indep_med ~ TDist(3)
+    β_med_dep ~ TDist(3)
+    β_control ~ filldist(TDist(3), size(control, 2))
+    # likelihood
+    mediator ~ MvNormal(α_med .+ indep * β_indep_med, σ_med)
+    dependent ~ MvNormal(α_dep .+ mediator * β_med_dep .+ control * β_control, σ_dep)
+    return (;
+        β_indep_med,
+        β_med_dep,
+        β_control,
+        α_med,
+        α_dep,
+        σ_dep,
+        σ_med,
+        dependent,  # for predictive checks
+    )
+end
+
+@model function full_model_long(
     dependent, mediator, indep, idx, control; n_gr=length(unique(idx))
 )
     # priors
@@ -122,10 +173,9 @@ end
 end
 
 # instantiate models
-mediation = mediation_model(
-    df.be_mean_std, df.risk_mean_std, ((df.ftv_std .+ df.fnp_std .+ df.fsm_std) ./ 3)
-)
-full = full_model(
+mediation = mediation_model(df.be_mean_std, df.risk_mean_std, df.hmtime_std)
+full = full_model(df.be_mean_std, df.fear_mean_std, df.hmtime_std, control_matrix)
+full_long = full_model_long(
     df_long.be_mean_std,
     df_long.risk_mean_std,
     df_long.media_val_std,

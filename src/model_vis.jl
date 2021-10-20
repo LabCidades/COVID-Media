@@ -21,10 +21,10 @@ end
 
 # Loading chains
 date = "2021-10-15"
-chn_full = deserialize(joinpath(pwd(), "chains", "full_$date.jls"))
+chn_full_long = deserialize(joinpath(pwd(), "chains", "full_long_$date.jls"))
 
 # subset chain only for β coeffs and α intercepts
-gen = generated_quantities(full, MCMCChains.get_sections(chn_full, :parameters))
+gen = generated_quantities(full_long, MCMCChains.get_sections(chn_full_long, :parameters))
 df = reduce(vcat, DataFrame(gen[:, i]) for i in 1:size(gen, 2))
 select!(df, Not([:dependent, :τ_med, :σ_dep, :σ_med]))
 df = select(
@@ -43,6 +43,10 @@ select!(df, Not([:x1, :x2, :x3]))
 # Convert to long format
 long_df = stack(df, 1:ncol(df); variable_name=:parameter, value_name=:value)
 
+# Model visualization function
+function model_vis()
+    
+end
 xticks = [
     "α_beh",
     "α_risk",
