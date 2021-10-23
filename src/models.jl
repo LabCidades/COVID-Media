@@ -173,7 +173,7 @@ end
 end
 
 # instantiate models
-mediation = mediation_model(df.be_mean_std, df.risk_mean_std, df.hmtime_std)
+mediation = mediation_model(df.be_mean_std, df.fear_mean_std, df.hmtime_std)
 full = full_model(df.be_mean_std, df.fear_mean_std, df.hmtime_std, control_matrix)
 full_long = full_model_long(
     df_long.be_mean_std,
