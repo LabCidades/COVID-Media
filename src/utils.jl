@@ -75,9 +75,16 @@ function recode_income(x::AbstractString)
            x == "Acima de R\$ 3.566"       ? 5 : missing
 end
 
+function recode_hm(x::AbstractString)
+    return x == "Menos de 1 hora"     ? 1 :
+           x == "1-2 horas"           ? 2 :
+           x == "3-5 horas"           ? 3 :
+           x == "Mais do que 5 horas" ? 4 : missing
+end
+
 function clean_data!(df::DataFrame)
     # Drop Missing Values
-    dropmissing!(df, [:age, :sex, :marriage, :income])
+    dropmissing!(df, [:age, :sex, :marriage, :income, :hmtime])
     dropmissing!(df, r"^hb_")
     dropmissing!(df, r"^afra")
     dropmissing!(df, r"^be_")
@@ -97,7 +104,8 @@ function clean_data!(df::DataFrame)
             names(df, r"^afra")    .=> x -> recode_afra.(x),
             names(df, r"^be_")     .=> x -> recode_be.(x),
             names(df, r"^f\w{2}")  .=> x -> recode_fmedia.(x),
-            names(df, r"^confi_")  .=> x -> recode_confi.(x);
+            names(df, r"^confi_")  .=> x -> recode_confi.(x),
+            :hmtime                 => x -> recode_hm.(x);
             renamecols=false)
     # Negative Coded Variables
     transform!(df,

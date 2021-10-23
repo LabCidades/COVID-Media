@@ -10,10 +10,11 @@ clean_data!(df)
 df |> CSV.write(joinpath(pwd(), "data", "responses_clean.csv"))
 
 select!(df, :age, :sex_male,
-        :ftv, :fnp, :fsm,
+        :hmtime,
+        :ftv, :fnp, :fsm, :fmp,
         names(df, r"mean$"))
 
-DataFrames.stack(df, [:ftv, :fnp, :fsm];
+DataFrames.stack(df, [:ftv, :fnp, :fsm, :fmp];
                  variable_name=:media_type,
                  value_name=:media_val) |> CSV.write(joinpath(pwd(),
                                                               "data",

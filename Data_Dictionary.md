@@ -73,15 +73,11 @@
 
 ![framework](tex/framework.png)
 
-- **Dependent**: `behaviors` -- mean of all `be_01` to `be_20` variables
+- **Dependent**: `behaviors` -- mean of all `be_01` to `be_20` variables -- `dep`
 - **Independent**:
-    - `media` -- $\beta$`_indep`:
-        - `ftv` -- $\alpha$`_j[1]`
-        - `fnp` -- $\alpha$`_j[2]`
-        - `fsm` -- $\alpha$`_j[3]`
-    - `fear` -- mean of `afra1` and `afra2` (not using at the moment)
+    - `hmtime` -- $\beta$`_indep`
 - **Mediator**:
-    - `risk` -- mean of `hb_b_psu`, `hb_b_pse`, `hb_a_psu` and `hb_a_pse` -- $\beta$`_med`
+    - `fear` -- mean of `afra1` and `afra2` -- $\beta$`_med`
 - **Control**:
     - `age` -- Numeric -- $\beta$`_control[1]`
     - `sex_male` -- Dummy -- $\beta$`_control[2]`
