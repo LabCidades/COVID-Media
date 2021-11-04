@@ -71,7 +71,6 @@ function model_vis_long(df)
         "β_age",
         "β_sex_male",
         "β_selfeff",
-        "β_media_fear",
         "β_fear_beh",
     ]
     plt =
@@ -79,7 +78,7 @@ function model_vis_long(df)
         mapping(:parameter, :value) *
         # color=:model,
         # dodge=:model) *
-        visual(BoxPlot; show_outliers=false)
+        visual(BoxPlot; show_outliers=false, width=0.95, whiskerlinewidth=0)
     fig = draw(
         plt;
         axis=(;
@@ -95,20 +94,14 @@ end
 function model_vis(df)
     df_stacked = stack(df, 1:ncol(df); variable_name=:parameter, value_name=:value)
     xticks = [
-        "α_beh",
-        "α_fear",
-        "β_age",
-        "β_sex_male",
-        "β_selfeff",
-        "β_media_fear",
-        "β_fear_beh",
+        "α_beh", "α_fear", "β_age", "β_sex_male", "β_selfeff", "β_media_fear", "β_fear_beh"
     ]
     plt =
         data(df_stacked) *
         mapping(:parameter, :value) *
         # color=:model,
         # dodge=:model) *
-        visual(BoxPlot; show_outliers=false)
+        visual(BoxPlot; show_outliers=false, width=0.95, whiskerlinewidth=0)
     fig = draw(
         plt;
         axis=(;
@@ -122,4 +115,4 @@ function model_vis(df)
 end
 
 save_figure(model_vis(df), "boxplot", "parameters")
-#save_figure(model_vis_long(df_long), "boxplot", "parameters_long")
+save_figure(model_vis_long(df_long), "boxplot", "parameters_long")

@@ -152,14 +152,12 @@ end
     σ_med ~ Exponential(1)
     σ_dep ~ Exponential(1)
     # coefficients
-    β_indep_med ~ TDist(3)
     β_med_dep ~ TDist(3)
     β_control ~ filldist(TDist(3), size(control, 2))
     # likelihood
-    mediator ~ MvNormal(α_med .+ α_med_j[idx] .+ indep * β_indep_med, σ_med)
+    mediator ~ MvNormal(α_med .+ α_med_j[idx], σ_med)
     dependent ~ MvNormal(α_dep .+ mediator * β_med_dep .+ control * β_control, σ_dep)
     return (;
-        β_indep_med,
         β_med_dep,
         β_control,
         α_med,
