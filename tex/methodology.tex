@@ -1,0 +1,123 @@
+% pandoc -s methodology.tex --citeproc --bibliography=references.bib -o methodology.docx
+
+\documentclass{article}
+
+%matemática 
+\usepackage{amsfonts}
+\usepackage{amssymb} 
+\usepackage{amsmath} 
+\usepackage{amsthm}
+
+%References
+%--------------------------------------
+\usepackage{csquotes}
+\usepackage[
+    natbib=true,
+    backend=biber,
+    style=apa,
+%    style=abnt,
+%    style=authoryear-comp,
+%    style=authoryear,
+%    style=ieee,
+    hyperref=true]
+    {biblatex}
+\addbibresource{references.bib}
+
+% Cite with \parencite or \textcite
+
+%--------------------------------------
+
+%Hyperref
+%--------------------------------------
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={Machine Learning, Redes Sociais e Modelos Epidemiológicos Bayesianos de COVID-19},
+    pdfpagemode=FullScreen,
+}
+\usepackage[pdftex]{color,graphicx}
+\usepackage[dvipsnames]{xcolor}
+\urlstyle{same}
+
+
+%Paragraph
+%--------------------------------------
+\setlength{\parindent}{2em}
+\setlength{\parskip}{1em}
+\renewcommand{\baselinestretch}{1.0}
+\usepackage{indentfirst}
+%--------------------------------------
+
+%etc
+%--------------------------------------
+\usepackage{caption}       % para maior controle sobre legendas
+\usepackage{multicol}      % para ajustar alinhamentos de colunas
+\usepackage{booktabs}      % pacote estético para tabelas
+\usepackage{adjustbox}     % ajustar itens LaTeX
+\usepackage{array}         % para ajustar espaçamentos
+\usepackage{comment}       % comentários grandes
+\usepackage{tabularx}      % colunas X nas tabelas
+
+%--------------------------------------
+\begin{document}
+
+\section{Sample}
+\label{sec:sample}
+
+We collected our data through an online survey using Google Forms.
+We e-mailed undergraduate, graduate and professional students of a large, private, not-for-profit university in the city of São Paulo, Brazil.
+The survey has 55 items and we provided no incentives and disclosed that it would help the university's research group to understand media comsumption and behavior during the challenging times of COVID-19.
+We also supplied the estimated time that it would take to respond the full survey (around 10 minutes).
+According to both the university's and Brazilian ethical guidelines, since we are no instrusive questions, nor incentives ro fill out the survey and respondents were invited to participate with the option to decline or drop out of the questionnaire at any time, it was not necessary IRB approval.
+% 20 be + hmtime + 4 fmedia + 2 fear + 2 control + 5 selfeff
+
+From the 55 survey's items we used only 34 items to measure all of our variables:
+
+\begin{itemize}
+	\item demographic variables: age (categorical 5-points) and gender;
+	\item self-efficacy: 5 items using 5-point Likert scale to measure self-efficacy (gustavo we need say something about what items we used, I do not know the scale);
+	\item fear: 2 items (gustavo we need say something about what items we used, I do not know the scale);
+	\item total media exposure: 1 item using a 4-point intensity scale regarding daily media comsumption about COVID-19;
+	\item media type: 4 types of media (newspaper, television, social media and medical professionals) using a 5-item intensity scale regarding the frequency of media usage regarding media comsumption about COVID-19; and
+	\item protective behaviors: 20 items using 5-point Likert scale to measure the adoption of protective behaviors during COVID-19 (gustavo we need say something about what items we used, I do not know the scale).
+\end{itemize}
+
+Our sample is comprised of 7,554 respondents and the summary statistics are detailed in table \ref{tbl:summstats}.
+The age variable was discretized in 5 categories with respect to the age in years: (1) below 17; (2) between 18 and 30 (3) between 31 and 50; (4) between 51 and 70; and (5) over 70.
+In our sample, 28 percent were men and 72 percent were women.
+In terms of age distribution, 65 percent were between 18 and 30 years old, and 30 percent were between 31 and 50 years old. Thus, at least 95 percent of our sample was not in the over-60 category, which is the group with the greatest risk of contracting COVID-19.
+
+\begin{table}[h]
+\begin{tabular}{|l *{8}{|c}|}
+	variable & mean & standard deviation & minimum & Q1 & median & Q3 & maximum \\
+	age & 2.362 & 0.578 & 1 & 2 &2 & 3 & 5 \\
+	sex\_male & 0.275 & 0.447 & 0 & 0 & 0 & 1 & 1 \\
+	self-efficacy & 0.414 & 0.646 & -2 & 0 & 0.4 & 0.8 & 2 \\
+	fear & 1.998  & 0.877  & 0 & 1.5 & 2 & 2 & 3 \\
+	total media exposure & 1.557 & 0.779 & 1 & 1 & 1 & 2 & 4 \\
+	media type - television & 2.698 & 1.299  & 0 & 2 & 3 & 4 & 4 \\
+	media type - newspaper & 1.846 & 1.557 & 0 & 0 & 2 & 3 & 4 \\
+	media type - social media & 2.197 & 1.456 & 0 & 1 & 2 & 3 & 4 \\
+	media type - medical professionals & 2.095 & 1.45 & 0 & 1 & 2 & 3 & 4 \\
+	protective behaviors & 2.804 & 0.545 & 0 & 2.571 & 2.905 & 3.190 & 3.81 \\
+
+\end{tabular}
+\caption{Sample's Summary Statistics}
+\label{tbl:summstats}
+\end{table}
+
+\section{Variables}
+\label{sec:variables}
+
+%References
+%--------------------------------------
+\medskip
+\printbibliography \label{bibliography}
+%--------------------------------------
+%End Document
+%--------------------------------------
+\end{document}
+%--------------------------------------
