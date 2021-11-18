@@ -1,15 +1,15 @@
 # Data Dictionary
 
-| Original Question                                                                                                                                                      | Coded Question | Likert |
-|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------|--------|
+| Original Question                                                                                                                                                      | Coded Question   | Likert |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------|--------|
 | Timestamp                                                                                                                                                              | `timestamp`      | time   |
-| Qual seu gênero?                                                                                                                                                       | `sex`            | open   |
+| Qual seu gênero?                                                                                                                                                       | `sex`            | binary |
 | Onde você more atualmente?                                                                                                                                             | `location`       | open   |
-| Qual a sua idade?                                                                                                                                                      | `age`            | open   |
-| Qual sua escolaridade?                                                                                                                                                 | `education`      | open   |
-| Qual seu estado civil?                                                                                                                                                 | `marriage`       | open   |
-| Atualmente como se enquadra o seu status empregatício?                                                                                                                 | `employment`     | open   |
-| Em qual faixa de renda mensal você se enquadra?                                                                                                                        | `income`         | open   |
+| Qual a sua idade?                                                                                                                                                      | `age`            | categ  |
+| Qual sua escolaridade?                                                                                                                                                 | `education`      | categ  |
+| Qual seu estado civil?                                                                                                                                                 | `marriage`       | categ  |
+| Atualmente como se enquadra o seu status empregatício?                                                                                                                 | `employment`     | categ  |
+| Em qual faixa de renda mensal você se enquadra?                                                                                                                        | `income`         | categ  |
 | Por favor, indique se possui qualquer uma das condições médicas abaixo?                                                                                                | `diaoth`         | open   |
 | Você já foi diagnosticado com COVID-19                                                                                                                                 | `diacov`         | binary |
 | Você está com sintomas de outra doença que não seja COVID-19?                                                                                                          | `diasympoth`     | binary |
@@ -66,8 +66,8 @@
 | O quão frequente você realizou as seguintes ações durante a pandemia? [Evitou transporte público?]                                                                     | `be_20`          | 5      |
 | O quão confiante você está com relação à: [Habilidade do governo em lidar com a pandemia de COVID-19?]                                                                 | `confi_gov`      | 4      |
 | O quão confiante você está com relação à: [Habilidade dos hospital em lidar com a pandemia de COVID-19?]                                                               | `confi_hos`      | 4      |
-| O quão confiante você está com relação à: [Habilidade dos profissionais de saúde em lidar com a pandemia de COVID-19?]                                                                          | `confi_wor`      | 4      |
-| O quão confiante você está com relação à: [Habilidade dos veículos de comunicação em transmitir informações úteis sobre a pandemia de COVID-19?]                                                     | `confi_media`    | 4      |
+| O quão confiante você está com relação à: [Habilidade dos profissionais de saúde em lidar com a pandemia de COVID-19?]                                                 | `confi_wor`      | 4      |
+| O quão confiante você está com relação à: [Habilidade dos veículos de comunicação em transmitir informações úteis sobre a pandemia de COVID-19?]                       | `confi_media`    | 4      |
 
 ## Variables
 
@@ -80,7 +80,23 @@
     - `fear` -- mean of `afra1` and `afra2` -- $\beta$`_med`
 - **Control**:
     - `age` -- Numeric -- $\beta$`_control[1]`
+        - `1`: Under 17
+        - `2`: 18-30
+        - `3` 31-50
+        - `4`: 51-70
+        - `5`: Over 70
     - `sex_male` -- Dummy -- $\beta$`_control[2]`
     - `selfeff` -- mean of `hb_b_se`, `hb_b_pse`, `hb_b_pbe`, `hb_a_pba` and `hb_a_se` -- $\beta$`_control[3]`
+    - `marriage` -- Numeric
+        - `1`: Single
+	- `2`: Married
+        - `3`: Divorced
+        - `4`: Widow 
+    - `income` -- Numeric
+        - `1`: Up to 178 BRL
+	- `2`: 179-369 BRL
+	- `3`: 369-1,008 BRL
+	- `4`: 1,009-3,566 BRL
+	- `5`: Over 3,566 BRL
 
 **Observation**: all variables were scaled to standard Normal with $\mu=0$ and $\sigma=1$.
