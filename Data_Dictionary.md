@@ -1,6 +1,6 @@
 # Data Dictionary
 
-| Original Question                                                                                                                                                      | Coded Question   | Likert |
+| Original Question                                                                                                                                                      | Coded Question   | Likert / Question Type |
 |------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------|--------|
 | Timestamp                                                                                                                                                              | `timestamp`      | time   |
 | Qual seu gênero?                                                                                                                                                       | `sex`            | binary |
