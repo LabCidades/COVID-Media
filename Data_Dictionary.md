@@ -75,28 +75,28 @@
 
 - **Dependent**: `behaviors` -- mean of all `be_01` to `be_20` variables -- `dep`
 - **Independent**:
-    - `hmtime` -- $\beta$`_indep`
+  - `hmtime` -- $\beta$`_indep`
 - **Mediator**:
-    - `fear` -- mean of `afra1` and `afra2` -- $\beta$`_med`
+  - `fear` -- mean of `afra1` and `afra2` -- $\beta$`_med`
 - **Control**:
-    - `age` -- Numeric -- $\beta$`_control[1]`
-        - `1`: Under 17
-        - `2`: 18-30
-        - `3` 31-50
-        - `4`: 51-70
-        - `5`: Over 70
-    - `sex_male` -- Dummy -- $\beta$`_control[2]`
-    - `selfeff` -- mean of `hb_b_se`, `hb_b_pse`, `hb_b_pbe`, `hb_a_pba` and `hb_a_se` -- $\beta$`_control[3]`
-    - `marriage` -- Numeric
-        - `1`: Single
-	- `2`: Married
-        - `3`: Divorced
-        - `4`: Widow 
-    - `income` -- Numeric
-        - `1`: Up to 178 BRL
-	- `2`: 179-369 BRL
-	- `3`: 369-1,008 BRL
-	- `4`: 1,009-3,566 BRL
-	- `5`: Over 3,566 BRL
+  - `age` -- Numeric -- $\beta$`_control[1]`
+    - `1`: Under 17
+    - `2`: 18-30
+    - `3` 31-50
+    - `4`: 51-70
+    - `5`: Over 70
+  - `sex_male` -- Dummy -- $\beta$`_control[2]`
+  - `selfeff` -- mean of `hb_b_se`, `hb_b_pse`, `hb_b_pbe`, `hb_a_pba` and `hb_a_se` -- $\beta$`_control[3]`
+  - `marriage` -- Numeric
+    - `1`: Single
+    - `2`: Married
+    - `3`: Divorced
+    - `4`: Widow 
+  - `income` -- Numeric
+    - `1`: Up to 178 BRL
+    - `2`: 179-369 BRL
+    - `3`: 369-1,008 BRL
+    - `4`: 1,009-3,566 BRL
+    - `5`: Over 3,566 BRL
 
 **Observation**: all variables were scaled to standard Normal with $\mu=0$ and $\sigma=1$.
