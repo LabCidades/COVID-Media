@@ -20,7 +20,7 @@ function save_figure(
 end
 
 # Loading chains
-date = "2021-10-20"
+date = "2021-11-18"
 chn_full = deserialize(joinpath(pwd(), "chains", "full_$date.jls"))
 chn_full_long = deserialize(joinpath(pwd(), "chains", "full_long_$date.jls"))
 
@@ -34,9 +34,15 @@ gen_full_long = generated_quantities(
 df_long = reduce(vcat, DataFrame(gen_full_long[:, i]) for i in 1:size(gen_full_long, 2))
 select!(df_long, Not([:dependent, :τ_med, :σ_dep, :σ_med]))
 df_long = select(
-    transform(df_long, :β_control => AsTable),
-    Not(:β_control),
-    [:x1, :x2, :x3] .=> ["β_control[1]", "β_control[2]", "β_control[3]"],
+    transform(df_long, :β_control_med => AsTable),
+    Not(:β_control_med),
+    [:x1, :x2, :x3] .=> ["β_control_med[1]", "β_control_med[2]", "β_control_med[3]"],
+)
+select!(df_long, Not([:x1, :x2, :x3]))
+df_long = select(
+    transform(df_long, :β_control_dep => AsTable),
+    Not(:β_control_dep),
+    [:x1, :x2, :x3] .=> ["β_control_dep[1]", "β_control_dep[2]", "β_control_dep[3]"],
 )
 select!(df_long, Not([:x1, :x2, :x3]))
 df_long = select(
@@ -51,27 +57,36 @@ select!(df_long, Not([:x1, :x2, :x3, :x4]))
 df = reduce(vcat, DataFrame(gen_full[:, i]) for i in 1:size(gen_full, 2))
 select!(df, Not([:dependent, :σ_dep, :σ_med]))
 df = select(
-    transform(df, :β_control => AsTable),
-    Not(:β_control),
-    [:x1, :x2, :x3] .=> ["β_control[1]", "β_control[2]", "β_control[3]"],
+    transform(df, :β_control_med => AsTable),
+    Not(:β_control_med),
+    [:x1, :x2, :x3] .=> ["β_control_med[1]", "β_control_med[2]", "β_control_med[3]"],
 )
-select!(df, 1:3, names(df, r"^β_control"), names(df, r"^α"), :)
 select!(df, Not([:x1, :x2, :x3]))
+df = select(
+    transform(df, :β_control_dep => AsTable),
+    Not(:β_control_dep),
+    [:x1, :x2, :x3] .=> ["β_control_dep[1]", "β_control_dep[2]", "β_control_dep[3]"],
+)
+select!(df, Not([:x1, :x2, :x3]))
+select!(df, 1:3, names(df, r"^β_control"), names(df, r"^α"), :)
 
 # Model visualization functions
 function model_vis_long(df)
     df_stacked = stack(df, 1:ncol(df); variable_name=:parameter, value_name=:value)
     xticks = [
-        "α_beh",
-        "α_fear",
+        "α_dep",
+        "α_med",
         "α_fear_tv",
         "α_fear_np",
         "α_fear_sm",
         "α_fear_mp",
-        "β_age",
-        "β_sex_male",
-        "β_selfeff",
-        "β_fear_beh",
+        "β_control_dep_age",
+        "β_control_dep_sex_male",
+        "β_control_dep_selfeff",
+        "β_control_med_age",
+        "β_control_med_sex_male",
+        "β_control_med_selfeff",
+        "β_med_dep",
     ]
     plt =
         data(df_stacked) *
@@ -79,22 +94,28 @@ function model_vis_long(df)
         # color=:model,
         # dodge=:model) *
         visual(BoxPlot; show_outliers=false, width=0.95, whiskerlinewidth=0)
-    fig = draw(
-        plt;
-        axis=(;
-            xticks=(1:length(xticks), xticks),
-            xticklabelrotation=π / 4,
-            yticks=-1.0:0.1:1.0,
-            #limits=(nothing, (-0.5, 0.5)),
-        ),
-    )
+    fig = draw(plt; axis=(;
+        xticks=(1:length(xticks), xticks),
+        xticklabelrotation=π / 4,
+        yticks=-1.0:0.1:1.0,
+        #limits=(nothing, (-0.5, 0.5)),
+    ))
     return fig
 end
 
 function model_vis(df)
     df_stacked = stack(df, 1:ncol(df); variable_name=:parameter, value_name=:value)
     xticks = [
-        "α_beh", "α_fear", "β_age", "β_sex_male", "β_selfeff", "β_media_fear", "β_fear_beh"
+        "α_dep",
+        "α_med",
+        "β_control_dep_age",
+        "β_control_dep_sex_male",
+        "β_control_dep_selfeff",
+        "β_control_med_age",
+        "β_control_med_sex_male",
+        "β_control_med_selfeff",
+        "β_indep_med",
+        "β_med_dep",
     ]
     plt =
         data(df_stacked) *

@@ -121,14 +121,16 @@ end
     # coefficients
     β_indep_med ~ TDist(3)
     β_med_dep ~ TDist(3)
-    β_control ~ filldist(TDist(3), size(control, 2))
+    β_control_med ~ filldist(TDist(3), size(control, 2))
+    β_control_dep ~ filldist(TDist(3), size(control, 2))
     # likelihood
-    mediator ~ MvNormal(α_med .+ indep * β_indep_med, σ_med)
-    dependent ~ MvNormal(α_dep .+ mediator * β_med_dep .+ control * β_control, σ_dep)
+    mediator ~ MvNormal(α_med .+ indep * β_indep_med .+ control * β_control_med, σ_med)
+    dependent ~ MvNormal(α_dep .+ mediator * β_med_dep .+ control * β_control_dep, σ_dep)
     return (;
         β_indep_med,
         β_med_dep,
-        β_control,
+        β_control_med,
+        β_control_dep,
         α_med,
         α_dep,
         σ_dep,
@@ -138,7 +140,7 @@ end
 end
 
 @model function full_model_long(
-    dependent, mediator, indep, idx, control; n_gr=length(unique(idx))
+    dependent, mediator, idx, control; n_gr=length(unique(idx))
 )
     # priors
     # intercepts
@@ -153,13 +155,15 @@ end
     σ_dep ~ Exponential(1)
     # coefficients
     β_med_dep ~ TDist(3)
-    β_control ~ filldist(TDist(3), size(control, 2))
+    β_control_med ~ filldist(TDist(3), size(control, 2))
+    β_control_dep ~ filldist(TDist(3), size(control, 2))
     # likelihood
-    mediator ~ MvNormal(α_med .+ α_med_j[idx], σ_med)
-    dependent ~ MvNormal(α_dep .+ mediator * β_med_dep .+ control * β_control, σ_dep)
+    mediator ~ MvNormal(α_med .+ α_med_j[idx] .+ control * β_control_med, σ_med)
+    dependent ~ MvNormal(α_dep .+ mediator * β_med_dep .+ control * β_control_dep, σ_dep)
     return (;
         β_med_dep,
-        β_control,
+        β_control_med,
+        β_control_dep,
         α_med,
         α_dep,
         α_med_j,
@@ -175,7 +179,6 @@ mediation = mediation_model(df.be_mean_std, df.fear_mean_std, df.hmtime_std)
 full = full_model(df.be_mean_std, df.fear_mean_std, df.hmtime_std, control_matrix)
 full_long = full_model_long(
     df_long.be_mean_std,
-    df_long.risk_mean_std,
     df_long.media_val_std,
     df_long.media_idx,
     control_matrix_long,
