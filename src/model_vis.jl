@@ -93,7 +93,7 @@ function model_vis_long(df)
         mapping(:parameter, :value) *
         # color=:model,
         # dodge=:model) *
-        visual(BoxPlot; show_outliers=false, width=0.95, whiskerlinewidth=0)
+        visual(BoxPlot; show_outliers=false, width=0.95, whiskerlinewidth=2)
     fig = draw(plt; axis=(;
         xticks=(1:length(xticks), xticks),
         xticklabelrotation=π / 4,
@@ -122,7 +122,7 @@ function model_vis(df)
         mapping(:parameter, :value) *
         # color=:model,
         # dodge=:model) *
-        visual(BoxPlot; show_outliers=false, width=0.95, whiskerlinewidth=0)
+        visual(BoxPlot; show_outliers=false, width=0.95, whiskerlinewidth=2)
     fig = draw(
         plt;
         axis=(;
