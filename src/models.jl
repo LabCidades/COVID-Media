@@ -80,10 +80,13 @@ transform!(
         ],
 )
 
+# media type
+media_type = [:ftv_std, :fnp_std, :fsm_std, :fmp_std]
+media_type_matrix = select(df, media_type) |> Matrix
+
 # control vars
 control_vars = [:age_std, :sex_male_std, :selfeff_mean_std]
 control_matrix = select(df, control_vars) |> Matrix
-control_matrix_long = select(df_long, control_vars) |> Matrix
 
 @model function mediation_model(dependent, mediator, indep)
     # priors
@@ -139,35 +142,31 @@ end
     )
 end
 
-@model function full_model_long(
-    dependent, mediator, idx, control; n_gr=length(unique(idx))
+@model function full_model_media_type(
+    dependent, mediator, media_type, control
 )
     # priors
     # intercepts
     α_med ~ TDist(3)
     α_dep ~ TDist(3)
-    # variance of random intercepts
-    τ_med ~ truncated(Cauchy(0, 2), 0, Inf) # group-level SDs intercepts
-    z_med_j ~ filldist(Normal(0, 1), n_gr)  # NCP group-level intercepts
-    α_med_j = z_med_j .* τ_med              # group-level intercepts
     # errors
     σ_med ~ Exponential(1)
     σ_dep ~ Exponential(1)
     # coefficients
     β_med_dep ~ TDist(3)
+    β_media_type_med ~ filldist(TDist(3), size(media_type, 2))
     β_control_med ~ filldist(TDist(3), size(control, 2))
     β_control_dep ~ filldist(TDist(3), size(control, 2))
     # likelihood
-    mediator ~ MvNormal(α_med .+ α_med_j[idx] .+ control * β_control_med, σ_med)
+    mediator ~ MvNormal(α_med .+ media_type * β_media_type_med .+ control * β_control_med, σ_med)
     dependent ~ MvNormal(α_dep .+ mediator * β_med_dep .+ control * β_control_dep, σ_dep)
     return (;
         β_med_dep,
+        β_media_type_med,
         β_control_med,
         β_control_dep,
         α_med,
         α_dep,
-        α_med_j,
-        τ_med,
         σ_dep,
         σ_med,
         dependent,  # for predictive checks
@@ -177,9 +176,9 @@ end
 # instantiate models
 mediation = mediation_model(df.be_mean_std, df.fear_mean_std, df.hmtime_std)
 full = full_model(df.be_mean_std, df.fear_mean_std, df.hmtime_std, control_matrix)
-full_long = full_model_long(
-    df_long.be_mean_std,
-    df_long.media_val_std,
-    df_long.media_idx,
-    control_matrix_long,
+full_media_type = full_model_media_type(
+    df.be_mean_std,
+    df.fear_mean_std,
+    media_type_matrix,
+    control_matrix,
 )
