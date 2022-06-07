@@ -86,7 +86,9 @@ media_type_matrix = select(df, media_type) |> Matrix
 
 # control vars
 control_vars = [:age_std, :sex_male_std, :selfeff_mean_std]
+control_interaction = [:age_std, :sex_male_std]
 control_matrix = select(df, control_vars) |> Matrix
+control_interaction_matrix = select(df, control_interaction) |> Matrix
 
 @model function mediation_model(dependent, mediator, indep)
     # priors
@@ -173,6 +175,32 @@ end
     )
 end
 
+# interaction model
+# fear*efficacy
+@model function interaction_model(dependent, indep1, indep2, control)
+    # priors
+    # intercepts
+    α ~ TDist(3)
+    # errors
+    σ ~ Exponential(1)
+    # coefficients
+    β_1 ~ TDist(3)
+    β_2 ~ TDist(3)
+    β_interaction = β_1 * β_2
+    β_control ~ filldist(TDist(3), size(control, 2))
+    # likelihood
+    dependent ~ MvNormal(α .+ indep1 * β_1 .+ indep2 * β_2 .+ control * β_control, σ)
+    return (;
+        β_1,
+        β_2,
+        β_interaction,
+        β_control,
+        α,
+        σ,
+        dependent,  # for predictive checks
+    )
+end
+
 # instantiate models
 mediation = mediation_model(df.be_mean_std, df.fear_mean_std, df.hmtime_std)
 full = full_model(df.be_mean_std, df.fear_mean_std, df.hmtime_std, control_matrix)
@@ -182,3 +210,4 @@ full_media_type = full_model_media_type(
     media_type_matrix,
     control_matrix,
 )
+interaction = interaction_model(df.be_mean_std, df.fear_mean_std, df.selfeff_mean_std, control_interaction_matrix)

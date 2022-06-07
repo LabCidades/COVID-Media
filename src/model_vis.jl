@@ -20,7 +20,7 @@ function save_figure(
 end
 
 # Loading chains
-date = "2021-11-18"
+date = "2022-06-07"
 chn_full = deserialize(joinpath(pwd(), "chains", "full_$date.jls"))
 chn_full_media_type = deserialize(joinpath(pwd(), "chains", "full_media_type_$date.jls"))
 

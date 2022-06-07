@@ -118,8 +118,7 @@ function clean_data!(df::DataFrame)
             [:hb_b_psu, :hb_b_pse,
              :hb_a_psu, :hb_a_pse]  => ByRow(+) => :risk_sum,
             [:hb_b_se, :hb_b_pse,
-             :hb_b_pbe, :hb_a_pba,
-             :hb_a_se]              => ByRow(+) => :selfeff_sum)
+             :hb_b_pbe, :hb_a_se]              => ByRow(+) => :selfeff_sum)
     transform!(df,
             :fear_sum               => ByRow(x -> x / length(names(df, r"^afra"))) => :fear_mean,
             :be_sum                 => ByRow(x -> x / length(names(df, r"^be_")))  => :be_mean,
@@ -158,8 +157,8 @@ function draw_violin(df::DataFrame, label::Pair{Symbol, String})
     # Custom Legend
     # Blue Female
     # Orange Male
-    elem_1 = PolyElement(color=RGBAf0(0.0f0,0.44705883f0,0.69803923f0,1.0f0))
-    elem_2 = PolyElement(color=RGBAf0(0.9019608f0,0.62352943f0,0.0f0,1.0f0))
+    elem_1 = PolyElement(color=RGBAf(0.0f0,0.44705883f0,0.69803923f0,1.0f0))
+    elem_2 = PolyElement(color=RGBAf(0.9019608f0,0.62352943f0,0.0f0,1.0f0))
     fig[end+1, 1] = Legend(fig,[elem_1, elem_2], ["Female", "Male"];
                            tellwidth=false, tellheight=true, orientation=:horizontal)
     return fig
