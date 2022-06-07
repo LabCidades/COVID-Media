@@ -29,8 +29,12 @@ function make_df(x::Matrix; type, dependent=false)
         df = select(
             transform(df, :β_media_type_med => AsTable),
             Not(:β_media_type_med),
-            [:x1, :x2, :x3, :x4] .=>
-                ["β_media_type_med[1]", "β_media_type_med[2]", "β_media_type_med[3]", "β_media_type_med[4]"],
+            [:x1, :x2, :x3, :x4] .=> [
+                "β_media_type_med[1]",
+                "β_media_type_med[2]",
+                "β_media_type_med[3]",
+                "β_media_type_med[4]",
+            ],
         )
         select!(df, 1:3, names(df, r"^β_control"), names(df, r"^β_media_type_med"), :)
         select!(df, Not([:x1, :x2, :x3, :x4]))
@@ -54,10 +58,9 @@ function make_df(x::Matrix; type, dependent=false)
         df = select(
             transform(df, :β_control => AsTable),
             Not(:β_control),
-            [:x1, :x2] .=>
-                ["β_control[1]", "β_control[2]"],
+            [:x1, :x2] .=> ["β_control[1]", "β_control[2]"],
         )
-        select!(df, Not([:x1, :x2,]))
+        select!(df, Not([:x1, :x2]))
         select!(df, 1:3, names(df, r"^β_control"), names(df, r"^α"), :)
     end
     summ = describe(
@@ -84,7 +87,7 @@ function make_summary(x::AbstractMatrix, title::AbstractString; type, dependent=
 end
 
 # Loading chains
-date = "2021-11-18"
+date = "2022-06-07"
 chn_mediation = deserialize(joinpath(pwd(), "chains", "mediation_$date.jls"))
 chn_full = deserialize(joinpath(pwd(), "chains", "full_$date.jls"))
 chn_full_media_type = deserialize(joinpath(pwd(), "chains", "full_media_type_$date.jls"))
