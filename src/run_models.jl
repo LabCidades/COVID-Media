@@ -11,19 +11,23 @@ nchains = 4
 test_mediation = sample(mediation, NUTS(), 50)
 test_full = sample(full, NUTS(), 50)
 test_full_media_type = sample(full_media_type, NUTS(), 50)
+test_interaction = sample(interaction, NUTS(), 50)
 
 # run model - WARNING! this might take a while
 # 300s to 400s
 chn_mediation = sample(mediation, NUTS(), MCMCThreads(), numsamples, nchains)
 chn_full = sample(full, NUTS(), MCMCThreads(), numsamples, nchains)
 chn_full_media_type = sample(full_media_type, NUTS(), MCMCThreads(), numsamples, nchains)
+chn_interaction = sample(interaction, NUTS(), MCMCThreads(), numsamples, nchains)
 
 # Saving chains
 serialize(joinpath(pwd(), "chains", "mediation_$(today()).jls"), chn_mediation)
 serialize(joinpath(pwd(), "chains", "full_$(today()).jls"), chn_full)
 serialize(joinpath(pwd(), "chains", "full_media_type_$(today()).jls"), chn_full_media_type)
+serialize(joinpath(pwd(), "chains", "interaction_$(today()).jls"), chn_interaction)
 
 # all rhats okay
 summarystats(chn_mediation)
 summarystats(chn_full)
 summarystats(chn_full_media_type)
+summarystats(chn_interaction)
