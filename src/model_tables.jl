@@ -87,14 +87,20 @@ function make_summary(x::AbstractMatrix, title::AbstractString; type, dependent=
 end
 
 # Loading chains
-date = "2022-06-07"
+date = "2022-06-10"
 chn_mediation = deserialize(joinpath(pwd(), "chains", "mediation_$date.jls"))
+chn_mediation_selfeff = deserialize(joinpath(pwd(), "chains", "mediation_selfeff_$date.jls"))
 chn_full = deserialize(joinpath(pwd(), "chains", "full_$date.jls"))
 chn_full_media_type = deserialize(joinpath(pwd(), "chains", "full_media_type_$date.jls"))
+chn_interaction = deserialize(joinpath(pwd(), "chains", "interaction_$date.jls"))
+chn_interaction_mediaexposure = deserialize(joinpath(pwd(), "chains", "interaction_mediaexposure_$date.jls"))
 
 # generating table
 gen_mediation = generated_quantities(
     mediation, MCMCChains.get_sections(chn_mediation, :parameters)
+)
+gen_mediation_selfeff = generated_quantities(
+    mediation_selfeff, MCMCChains.get_sections(chn_mediation_selfeff, :parameters)
 )
 gen_full = generated_quantities(full, MCMCChains.get_sections(chn_full, :parameters))
 gen_full_media_type = generated_quantities(
@@ -103,14 +109,22 @@ gen_full_media_type = generated_quantities(
 gen_interaction = generated_quantities(
     interaction, MCMCChains.get_sections(chn_interaction, :parameters)
 )
+gen_interaction_mediaexposure = generated_quantities(
+    interaction_mediaexposure, MCMCChains.get_sections(chn_interaction_mediaexposure, :parameters)
+)
 make_summary(gen_mediation, "Mediation $date"; type="mediation")
+make_summary(gen_mediation_selfeff, "Mediation Self-Efficacy $date"; type="mediation")
 make_summary(gen_full, "Model $date"; type="full")
 make_summary(gen_full_media_type, "Model Media Type $date"; type="full_media_type")
 make_summary(gen_interaction, "Interaction $date"; type="interaction")
+make_summary(gen_interaction_mediaexposure, "Interaction Media Exposure $date"; type="interaction")
 
 # saving table
 CSV.write(joinpath(pwd(), "tables", "mediation_summary_$date.csv"))(
     make_df(gen_mediation; type="mediation")
+)
+CSV.write(joinpath(pwd(), "tables", "mediation_selfeff_summary_$date.csv"))(
+    make_df(gen_mediation_selfeff; type="mediation")
 )
 CSV.write(joinpath(pwd(), "tables", "full_summary_$date.csv"))(
     make_df(gen_full; type="full")
@@ -120,4 +134,7 @@ CSV.write(joinpath(pwd(), "tables", "full_media_type_summary_$date.csv"))(
 )
 CSV.write(joinpath(pwd(), "tables", "interaction_summary_$date.csv"))(
     make_df(gen_interaction; type="interaction")
+)
+CSV.write(joinpath(pwd(), "tables", "interaction_mediaexposure_summary_$date.csv"))(
+    make_df(gen_interaction_mediaexposure; type="interaction")
 )
