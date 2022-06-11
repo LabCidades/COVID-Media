@@ -186,10 +186,10 @@ end
     # coefficients
     β_1 ~ TDist(3)
     β_2 ~ TDist(3)
-    β_interaction = β_1 * β_2
+    β_interaction ~ TDist(3)
     β_control ~ filldist(TDist(3), size(control, 2))
     # likelihood
-    dependent ~ MvNormal(α .+ indep1 * β_1 .+ indep2 * β_2 .+ control * β_control, σ)
+    dependent ~ MvNormal(α .+ indep1 * β_1 .+ indep2 * β_2 .+ (β_interaction .* indep1 .* indep2) .+ control * β_control, σ)
     return (;
         β_1,
         β_2,
@@ -203,6 +203,7 @@ end
 
 # instantiate models
 mediation = mediation_model(df.be_mean_std, df.fear_mean_std, df.hmtime_std)
+mediation_selfeff = mediation_model(df.be_mean_std, df.selfeff_mean_std, df.hmtime_std)
 full = full_model(df.be_mean_std, df.fear_mean_std, df.hmtime_std, control_matrix)
 full_media_type = full_model_media_type(
     df.be_mean_std,
@@ -211,3 +212,4 @@ full_media_type = full_model_media_type(
     control_matrix,
 )
 interaction = interaction_model(df.be_mean_std, df.fear_mean_std, df.selfeff_mean_std, control_interaction_matrix)
+interaction_mediaexposure = interaction_model(df.be_mean_std, df.hmtime_std, df.selfeff_mean_std, control_interaction_matrix)
