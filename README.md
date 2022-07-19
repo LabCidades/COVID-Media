@@ -5,7 +5,7 @@
 
 <!-- pandoc Data_Dictionary.md -V geometry:landscape -o Data_Dictionary.pdf -->
 
-Data and Code for the paper "INSERT TITLE HERE" published at "INSERT JOURNAL HERE".
+Data and Code for the paper "Media Exposure and Adoption of COVID19 preventive Behaviors in Brazil" published at New Media and Society.
 
 ```
 APA citation here
