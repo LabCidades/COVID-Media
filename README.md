@@ -8,11 +8,23 @@
 Data and Code for the paper "Media Exposure and Adoption of COVID19 preventive Behaviors in Brazil" published at New Media and Society.
 
 ```
-APA citation here
+Mesch, G. S., da Silva Neto, W. L. B., & Storopoli, J. E. (2022). Media exposure and adoption of COVID-19 preventive behaviors in Brazil. New Media & Society, 0(0). https://doi.org/10.1177/14614448221122203
 ```
 
 ```bibtex
-BibTeX citation here
+@article{
+  doi:10.1177/14614448221122203,
+  author = {Gustavo S Mesch and Wilson Levy Braga da Silva Neto and Jose Eduardo Storopoli},
+  title ={Media exposure and adoption of COVID-19 preventive behaviors in Brazil},
+  journal = {New Media \& Society},
+  volume = {0},
+  number = {0},
+  pages = {14614448221122203},
+  year = {0},
+  doi = {10.1177/14614448221122203},
+  URL = {https://doi.org/10.1177/14614448221122203},
+  eprint = {https://doi.org/10.1177/14614448221122203}    
+}
 ```
 
 ## Data Dictionary
